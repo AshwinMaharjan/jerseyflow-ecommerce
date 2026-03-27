@@ -1,0 +1,179 @@
+/* ============================================================
+   JerseyFlow — Hero Section Stylesheet
+   File: hero_section.css
+   ============================================================ */
+
+/* ── Variables (reuse from navbar if already loaded) ────────── */
+:root {
+  --bg:       #1A1A1A;
+  --cream:    #EEE5D8;
+  --red:      #681010;
+  --red-dim:  rgba(104,16,16,.35);
+  --nav-h:    64px;
+}
+
+/* ── Slider Wrapper ─────────────────────────────────────────── */
+.jf-hero {
+  position: relative;
+  width: 100%;
+  margin-top: var(--nav-h);          /* push below fixed navbar */
+  overflow: hidden;
+  background: var(--bg);
+  user-select: none;
+}
+
+/* ── Track (holds all slides side-by-side) ──────────────────── */
+.jf-hero__track {
+  display: flex;
+  transition: transform .6s cubic-bezier(.77, 0, .18, 1);
+  will-change: transform;
+}
+
+/* ── Single Slide ───────────────────────────────────────────── */
+.jf-hero__slide {
+  min-width: 100%;
+  /*
+   * True 21:9 — height is ~43% of width, naturally compact.
+   * On a 1920px screen this is ~823px wide × ~370px tall,
+   * nowhere near full-screen. max-height keeps it tight on
+   * very large monitors.
+   */
+  aspect-ratio: 21 / 9;
+  max-height: 480px;
+  position: relative;
+  overflow: hidden;
+}
+
+.jf-hero__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  /* subtle Ken-Burns on active slide */
+  transition: transform 6s ease;
+  transform: scale(1.04);
+}
+.jf-hero__slide.active img {
+  transform: scale(1);
+}
+
+/* light dark gradient at bottom for readability */
+.jf-hero__slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 40%,
+    rgba(10,10,10,.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Prev / Next Arrows ─────────────────────────────────────── */
+.jf-hero__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(26,26,26,.55);
+  border: 1px solid rgba(238,229,216,.15);
+  color: var(--cream);
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.jf-hero__arrow:hover {
+  background: var(--red);
+  border-color: var(--red);
+  transform: translateY(-50%) scale(1.08);
+}
+.jf-hero__arrow.prev { left: 20px; }
+.jf-hero__arrow.next { right: 20px; }
+
+/* ── Dot Indicators ─────────────────────────────────────────── */
+.jf-hero__dots {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.jf-hero__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(238,229,216,.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background .25s, transform .25s, width .25s;
+}
+.jf-hero__dot.active {
+  background: var(--red);
+  width: 24px;
+  border-radius: 4px;
+}
+.jf-hero__dot:hover:not(.active) {
+  background: rgba(238,229,216,.7);
+}
+
+/* ── Slide Counter ──────────────────────────────────────────── */
+.jf-hero__counter {
+  position: absolute;
+  bottom: 18px;
+  right: 24px;
+  z-index: 10;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .12em;
+  color: rgba(238,229,216,.5);
+}
+.jf-hero__counter span { color: var(--cream); }
+
+/* ── Progress bar ───────────────────────────────────────────── */
+.jf-hero__progress {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--red);
+  z-index: 10;
+  transition: width linear;   /* duration set by JS */
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .jf-hero__slide {
+    /* On tablets, 21:9 ratio gets too thin — give it a min-height floor */
+    aspect-ratio: 21 / 9;
+    min-height: 200px;
+    max-height: 320px;
+  }
+  .jf-hero__arrow {
+    width: 38px; height: 38px;
+    font-size: .85rem;
+  }
+  .jf-hero__arrow.prev { left: 10px; }
+  .jf-hero__arrow.next { right: 10px; }
+
+  .jf-hero__counter { display: none; }
+}
+
+@media (max-width: 480px) {
+  .jf-hero__slide {
+    aspect-ratio: 21 / 9;
+    min-height: 160px;
+    max-height: 240px;
+  }
+  .jf-hero__arrow { display: none; } /* swipe only on small phones */
+}

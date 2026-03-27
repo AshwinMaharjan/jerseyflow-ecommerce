@@ -1,0 +1,3 @@
+set @num:=0;
+update users set user_id=@num:=(@num+1);
+alter table users auto_increment=1;

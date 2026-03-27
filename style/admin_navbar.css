@@ -1,0 +1,232 @@
+/* ============================================================
+   JerseyFlow — Admin Navbar Stylesheet
+   File: admin_navbar.css
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap');
+
+:root {
+  --bg: #121212;
+  --panel: #1A1A1A;
+  --text: #EEE5D8;
+  --muted: rgba(238,229,216,.6);
+  --border: rgba(255,255,255,.08);
+  --red: #681010;
+  --hover: rgba(255,255,255,.06);
+  --shadow: 0 6px 24px rgba(0,0,0,.4);
+  --nav-h: 64px;
+}
+
+/* ── RESET ─────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── NAVBAR ─────────────────────────────────────────────────── */
+.admin-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  z-index: 1000;
+}
+
+/* ── LEFT: LOGO ─────────────────────────────────────────────── */
+.admin-logo a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.admin-logo img {
+  height: 140px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  margin-left:-80px;
+
+}
+
+.admin-logo span {
+  font-size: .9rem;
+  opacity: .9;
+}
+
+/* ── CENTER: SEARCH ─────────────────────────────────────────── */
+.admin-search {
+  flex: 1;
+  max-width: 420px;
+  margin: 0 24px;
+  display: flex;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  transition: border .2s, box-shadow .2s;
+}
+
+.admin-search:focus-within {
+  border-color: rgba(104,16,16,.6);
+  box-shadow: 0 0 0 3px rgba(104,16,16,.15);
+}
+
+.admin-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: .9rem;
+}
+
+.admin-search button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .2s, background .2s;
+}
+
+.admin-search button:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+
+/* ── RIGHT ACTIONS ─────────────────────────────────────────── */
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── ICON BUTTON ────────────────────────────────────────────── */
+.admin-icon,
+.admin-profile {
+  position: relative;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background .2s, color .2s;
+}
+
+.admin-icon:hover,
+.admin-profile:hover {
+  background: var(--hover);
+}
+
+/* ── PROFILE NAME ───────────────────────────────────────────── */
+.admin-name {
+  font-size: .85rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: .05em;
+  opacity: .85;
+}
+
+/* ── DROPDOWN MENU ─────────────────────────────────────────── */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100%);
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 220px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: all .2s ease;
+  overflow: hidden;
+  z-index: 999;
+}
+
+/* show dropdown on hover */
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-menu h4 {
+  padding: 10px 14px;
+  font-size: .8rem;
+  text-transform: uppercase;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: .1em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+/* dropdown links */
+.dropdown-menu a {
+  display: block;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: .88rem;
+  transition: background .2s, padding-left .2s;
+}
+
+.dropdown-menu a:hover {
+  background: var(--hover);
+  padding-left: 18px;
+}
+
+/* logout special */
+.dropdown-menu .logout {
+  color: #ff4d4d;
+}
+
+/* divider */
+.dropdown-menu hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 6px 0;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .admin-search {
+    display: none;
+  }
+
+  .admin-name {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-nav {
+    padding: 0 12px;
+  }
+
+  .admin-actions {
+    gap: 8px;
+  }
+}

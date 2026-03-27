@@ -1,0 +1,203 @@
+/* ============================================================
+   JerseyFlow — Clubs Section Stylesheet
+   File: clubs_section.css
+   ============================================================ */
+
+/* ── Clubs Section Wrapper ──────────────────────────────────── */
+.jf-clubs {
+  background: #141414;
+  padding: 60px 40px 72px;
+  text-align: center;
+}
+
+/* ── Section Heading ────────────────────────────────────────── */
+.jf-clubs__heading {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+
+.jf-clubs__heading h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #EEE5D8;
+  line-height: 1;
+}
+
+/* red underline accent */
+.jf-clubs__heading h2 span {
+  color: #681010;
+}
+
+.jf-clubs__heading-line {
+  width: 48px;
+  height: 3px;
+  background: #681010;
+  border-radius: 2px;
+}
+
+.jf-clubs__sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: .85rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(238,229,216,.35);
+  margin-top: 4px;
+}
+
+/* ── Grid ───────────────────────────────────────────────────── */
+.jf-clubs__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Club Card ──────────────────────────────────────────────── */
+.jf-club-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 24px 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(238,229,216,.06);
+  background: rgba(255,255,255,.03);
+  transition:
+    background   .25s,
+    border-color .25s,
+    transform    .25s cubic-bezier(.34,1.56,.64,1),
+    box-shadow   .25s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle glow layer on hover */
+.jf-club-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(104,16,16,.18), transparent 70%);
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+
+.jf-club-card:hover {
+  background: rgba(104,16,16,.12);
+  border-color: rgba(104,16,16,.5);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0,0,0,.45);
+}
+.jf-club-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Club Logo Image ────────────────────────────────────────── */
+.jf-club-card__img-wrap {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.jf-club-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), filter .3s;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
+}
+.jf-club-card:hover img {
+  transform: scale(1.12);
+  filter: drop-shadow(0 4px 16px rgba(104,16,16,.5));
+}
+
+/* ── Club Name Label ────────────────────────────────────────── */
+.jf-club-card__name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(238,229,216,.65);
+  transition: color .25s;
+  position: relative;
+  z-index: 1;
+}
+.jf-club-card:hover .jf-club-card__name {
+  color: #EEE5D8;
+}
+
+/* ── "Shop Jerseys" tag that appears on hover ───────────────── */
+.jf-club-card__tag {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #681010;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  transition: bottom .25s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+  opacity: 0;
+  z-index: 2;
+}
+.jf-club-card:hover .jf-club-card__tag {
+  bottom: 12px;
+  opacity: 1;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .jf-clubs__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .jf-clubs {
+    padding: 48px 20px 60px;
+  }
+  .jf-clubs__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .jf-clubs__heading h2 {
+    font-size: 1.7rem;
+  }
+  .jf-club-card {
+    padding: 18px 10px 14px;
+    border-radius: 10px;
+  }
+  .jf-club-card__img-wrap {
+    width: 56px;
+    height: 56px;
+  }
+  .jf-club-card__tag { display: none; }
+}
+
+@media (max-width: 380px) {
+  .jf-clubs__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

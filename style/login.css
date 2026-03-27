@@ -1,0 +1,202 @@
+body {
+  margin: 0;
+  font-family: 'Barlow', sans-serif;
+  background: #0f0f0f;
+  color: #EEE5D8;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT */
+/* .login-brand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  background: radial-gradient(circle, rgba(104,16,16,.2), transparent);
+} */
+.login-brand {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ALL SLIDES */
+.bg-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50px; /* instead of margin */
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0;
+  animation: fadeSlide 25s infinite;
+}
+
+/* slides with proper delays */
+.slide1 { background-image: url('../images/login/jersey1.png'); animation-delay: 0s; }
+.slide2 { background-image: url('../images/login/jersey2.png'); animation-delay: 5s; }
+.slide3 { background-image: url('../images/login/jersey3.png'); animation-delay: 10s; }
+.slide4 { background-image: url('../images/login/jersey4.png'); animation-delay: 15s; }
+.slide5 { background-image: url('../images/login/jersey5.png'); animation-delay: 20s; }
+
+/* PERFECT TIMING (no overlap) */
+@keyframes fadeSlide {
+
+  0%   { opacity: 0; }
+
+  /* fade in */
+  4%   { opacity: 1; }
+
+  /* visible */
+  16%  { opacity: 1; }
+
+  /* fade out */
+  20%  { opacity: 0; }
+
+  /* hidden rest */
+  100% { opacity: 0; }
+}
+/* TEXT ABOVE IMAGES */
+.brand-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+}
+/* RIGHT */
+.login-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  background: #181818;
+}
+
+.login-card h2{
+    padding-bottom: 30px;
+}
+
+/* INPUT */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  transition: .3s;
+}
+
+.input-group input:focus {
+  border-color: #681010;
+  box-shadow: 0 0 10px rgba(104,16,16,.5);
+  outline: none;
+}
+
+.input-group label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 12px;
+  background: #181818;
+  padding: 0 5px;
+  color: rgba(255,255,255,.5);
+}
+
+/* PASSWORD TOGGLE */
+.toggle {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+}
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #681010;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.btn:hover {
+  background: #8a1414;
+  transform: translateY(-2px);
+}
+
+/* ERROR */
+.error {
+  color: #ff4d4d;
+  font-size: 12px;
+}
+
+/* DEMO */
+.demo {
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+}
+
+/* Register link */
+.register-link {
+  margin-top: 15px;
+  font-size: 14px;
+  color: rgba(255,255,255,.6);
+}
+
+.register-link a {
+  color: #d02020;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 14px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s ease;
+  z-index: 9999;
+}
+
+.popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.popup.success {
+  background: #2ecc71;
+}
+
+.popup.error {
+  background: #e74c3c;
+}

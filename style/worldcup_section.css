@@ -1,0 +1,171 @@
+/* ============================================================
+   JerseyFlow — World Cup Section
+   ============================================================ */
+
+.jf-worldcup {
+  background: #0f0f0f;
+  padding: 80px 40px;
+}
+
+/* Layout */
+.jf-worldcup__container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 60px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* LEFT SIDE */
+.jf-worldcup__left h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2.4rem;
+  text-transform: uppercase;
+  color: #EEE5D8;
+}
+
+.jf-worldcup__left span {
+  color: #681010;
+}
+
+.jf-worldcup__sub {
+  color: rgba(255,255,255,.4);
+  letter-spacing: .2em;
+  font-size: .8rem;
+  margin-bottom: 10px;
+}
+
+.jf-worldcup__desc {
+  color: rgba(255,255,255,.6);
+  margin: 20px 0;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* CTA */
+.jf-worldcup__cta {
+  display: inline-block;
+  margin-bottom: 30px;
+  padding: 10px 20px;
+  background: #681010;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: .3s;
+}
+
+.jf-worldcup__cta:hover {
+  background: #8a1414;
+}
+
+/* FILTERS */
+.jf-worldcup__filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.jf-worldcup__filters button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.2);
+  color: #ccc;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: .3s;
+}
+
+.jf-worldcup__filters button.active,
+.jf-worldcup__filters button:hover {
+  background: #681010;
+  color: #fff;
+  border-color: #681010;
+}
+
+/* RIGHT GRID */
+.jf-worldcup__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* PRODUCT CARD */
+.jf-product-card {
+  background: #181818;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: .3s;
+  cursor: pointer;
+}
+
+.jf-product-card:hover {
+  transform: translateY(-6px);
+}
+
+/* IMAGE */
+.jf-product-card__img {
+  position: relative;
+}
+
+.jf-product-card__img img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain; /* KEY FIX */
+  background: #111;     /* optional: fills empty space nicely */
+}
+
+/* BADGE */
+.jf-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #681010;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: .7rem;
+  border-radius: 20px;
+}
+
+/* INFO */
+.jf-product-card__info {
+  padding: 14px;
+}
+
+.jf-product-card__info h4 {
+  color: #EEE5D8;
+  font-size: .95rem;
+  margin-bottom: 8px;
+}
+
+/* PRICE */
+.jf-price {
+  display: flex;
+  gap: 10px;
+}
+
+.jf-price .new {
+  color: #fff;
+  font-weight: 600;
+}
+
+.jf-price .old {
+  text-decoration: line-through;
+  color: rgba(255,255,255,.4);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .jf-worldcup__container {
+    grid-template-columns: 1fr;
+  }
+
+  .jf-worldcup__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .jf-worldcup__grid {
+    grid-template-columns: 1fr;
+  }
+}
