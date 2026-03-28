@@ -18,7 +18,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
 <link rel="stylesheet" href="../style/admin_navbar.css" />
 
 <!-- ═════════════════════ ADMIN NAVBAR ═════════════════════ -->
@@ -26,7 +26,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
   <!-- ── LEFT: BRAND ───────────────────────────── -->
   <div class="admin-logo">
-    <a href="homepage.php">
+    <a href="admin_homepage.php">
       <img src="../images/logo.png" alt="JerseyFlow Admin" />
     </a>
   </div>
@@ -87,16 +87,29 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
       <div class="dropdown-menu profile-menu">
         <a href="profile.php">My Profile</a>
-        <a href="settings.php">Settings</a>
         <a href="change_password.php">Change Password</a>
         <hr />
-        <a href="../logout.php" class="logout">Logout</a>
+          <a href="#" onclick="openLogoutModal()">Logout</a>
       </div>
     </div>
 
   </div>
 </nav>
 
+<!-- LOGOUT MODAL -->
+<div id="logoutModal">
+  <div class="logout-box">
+
+    <h2>Confirm Logout</h2>
+    <p>Are you sure you want to logout?</p>
+
+    <div class="logout-actions">
+      <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+      <a href="../homepage.php" class="logout-btn">Logout</a>
+    </div>
+
+  </div>
+</div>
 <!-- ═════════════════════ JS ═════════════════════ -->
 <script>
 (function () {
@@ -112,4 +125,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
   });
 
 })();
+
+function openLogoutModal() {
+  document.getElementById("logoutModal").style.display = "flex";
+}
+
+function closeLogoutModal() {
+  document.getElementById("logoutModal").style.display = "none";
+}
+
+// close when clicking outside
+window.onclick = function(e) {
+  let modal = document.getElementById("logoutModal");
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+};
 </script>

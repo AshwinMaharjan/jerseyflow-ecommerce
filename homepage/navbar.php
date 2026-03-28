@@ -17,7 +17,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!-- Font Awesome CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
 <!-- Navbar CSS -->
 <link rel="stylesheet" href="style/navbar.css" />
 

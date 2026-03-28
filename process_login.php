@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 
 $conn = new mysqli("localhost", "root", "", "jerseyflow");
@@ -6,7 +6,6 @@ $conn = new mysqli("localhost", "root", "", "jerseyflow");
 $email = $_POST['email'];
 $password = $_POST['password'];
 
-// prepared statement
 $stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -19,42 +18,16 @@ if($result->num_rows > 0){
         
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['role'] = $user['role'];
+        $_SESSION['name'] = $user['full_name'];
 
-        // ✅ success popup (will show in homepage)
-        $_SESSION['popup'] = [
-            "type" => "success",
-            "message" => "Login successful!"
-        ];
-
-        if($user['role'] === 'admin'){
-            header("Location: admin/homepage.php");
-        } else if($user['role'] === 'user'){
-            header("Location: users/homepage.php");
-        } else {
-            $_SESSION['popup'] = [
-                "type" => "error",
-                "message" => "Invalid role!"
-            ];
-            header("Location: login.php");
-        }
-
-        exit();
+        // ✅ return success instead of redirect
+        echo "success|" . $user['role'] . "|" . $user['full_name'];
 
     } else {
-        $_SESSION['popup'] = [
-            "type" => "error",
-            "message" => "Incorrect password!"
-        ];
-        header("Location: login.php");
-        exit();
+        echo "Incorrect password!";
     }
 
 } else {
-    $_SESSION['popup'] = [
-        "type" => "error",
-        "message" => "User not found!"
-    ];
-    header("Location: login.php");
-    exit();
+    echo "User not found!";
 }
 ?>

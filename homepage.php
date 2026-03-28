@@ -11,6 +11,7 @@
     <?php include("homepage/hero_section.php"); ?>
     <?php include("homepage/clubs_section.php"); ?>
     <?php include("homepage/worldcup_section.php"); ?>
+    <?php include("footer.php"); ?>
 
 </body>
 </html>

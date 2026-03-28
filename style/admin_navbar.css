@@ -3,7 +3,17 @@
    File: admin_navbar.css
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap');
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../assets/fonts/barlow-condensed/BarlowCondensed-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../assets/fonts/barlow-condensed/BarlowCondensed-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+}
 
 :root {
   --bg: #121212;
@@ -31,7 +41,7 @@
   left: 0;
   right: 0;
   height: var(--nav-h);
-  background: var(--bg);
+  background: var(--panel);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -229,4 +239,84 @@
   .admin-actions {
     gap: 8px;
   }
+}
+
+/* LOGOUT MODAL OVERLAY */
+#logoutModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* BOX */
+.logout-box {
+  background: #181818;
+  padding: 30px;
+  border-radius: 10px;
+  width: 320px;
+  text-align: center;
+  animation: pop .3s ease-in-out;
+}
+
+@keyframes pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* TEXT */
+.logout-box h2 {
+  margin: 0 0 10px;
+  color: #fff;
+}
+
+.logout-box p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 20px;
+}
+
+/* BUTTONS */
+.logout-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cancel-btn,
+.logout-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* CANCEL */
+.cancel-btn {
+  background: #333;
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background: #444;
+}
+
+/* LOGOUT */
+.logout-btn {
+  background: #681010;
+  color: #fff;
+}
+
+.logout-btn:hover {
+  background: #8a1414;
 }

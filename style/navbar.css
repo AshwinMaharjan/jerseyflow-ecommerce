@@ -3,7 +3,17 @@
    File: navbar.css
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap');
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../assets/fonts/barlow-condensed/BarlowCondensed-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../assets/fonts/barlow-condensed/BarlowCondensed-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+}
 
 :root {
   --bg:       #1A1A1A;
@@ -242,7 +252,7 @@
 }
 .jf-search-btn {
   position: absolute;
-  left: 0;
+  left: -10px;
   background: none;
   border: none;
   color: var(--cream);
@@ -256,9 +266,12 @@
 }
 .jf-search-wrap:not(.open) .jf-search-btn {
   background: rgba(255,255,255,.06);
+    left: -10px;
 }
 .jf-search-wrap:not(.open) .jf-search-btn:hover {
   background: rgba(255,255,255,.12);
+    left: -10px;
+
 }
 .jf-search-wrap.open .jf-search-btn { color: var(--red); }
 

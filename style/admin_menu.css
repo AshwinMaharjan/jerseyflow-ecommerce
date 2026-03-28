@@ -1,0 +1,317 @@
+/* ─── Admin Sidebar Menu ─────────────────────────────────────────────────── */
+
+.admin-sidebar {
+  position: fixed;
+  top: -10px;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  /* overflow-y: auto;
+  overflow-x: hidden; */
+  z-index: 100;
+  box-shadow: var(--shadow);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  overflow: hidden;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ─── Brand / Logo ────────────────────────────────────────────────────────── */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 18px;
+  border-bottom: none;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--red);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.sidebar-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sidebar-brand-sub {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─── Nav Sections ───────────────────────────────────────────────────────── */
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 0;
+}
+
+.sidebar-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 20px 6px;
+}
+
+/* ─── Menu Item ──────────────────────────────────────────────────────────── */
+
+.sidebar-item {
+  position: relative;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 20px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s, color 0.18s, padding-left 0.18s;
+  border-radius: 0;
+  letter-spacing: 0.01em;
+}
+
+.sidebar-link:hover {
+  background: var(--hover);
+  color: var(--text);
+  padding-left: 24px;
+}
+
+.sidebar-link.active {
+  background: rgba(104, 16, 16, 0.22);
+  color: var(--text);
+  border-left: 3px solid var(--red);
+  padding-left: 17px;
+}
+
+.sidebar-link.active .sidebar-link-icon {
+  color: #c0392b;
+}
+
+.sidebar-link-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: color 0.18s;
+}
+
+.sidebar-link-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Chevron / Arrow ─────────────────────────────────────────────────────── */
+
+.sidebar-chevron {
+  font-size: 11px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.sidebar-item.open > .sidebar-link .sidebar-chevron {
+  transform: rotate(180deg);
+  color: var(--text);
+}
+
+/* ─── Dropdown ───────────────────────────────────────────────────────────── */
+
+.sidebar-dropdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-item.open > .sidebar-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sidebar-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 20px 8px 51px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 400;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.01em;
+  position: relative;
+}
+
+.sidebar-dropdown-link::before {
+  content: '';
+  position: absolute;
+  left: 38px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.15s;
+}
+
+.sidebar-dropdown-link:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.sidebar-dropdown-link:hover::before {
+  background: var(--red);
+}
+
+.sidebar-dropdown-link.active {
+  color: var(--text);
+}
+
+.sidebar-dropdown-link.active::before {
+  background: var(--red);
+}
+
+/* ─── Divider ─────────────────────────────────────────────────────────────── */
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 10px 16px;
+}
+
+/* ─── Logout ──────────────────────────────────────────────────────────────── */
+
+.sidebar-footer {
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 20px;
+  color: rgba(192, 57, 43, 0.75);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s, color 0.18s;
+  letter-spacing: 0.01em;
+}
+
+.sidebar-logout:hover {
+  background: rgba(104, 16, 16, 0.2);
+  color: #e74c3c;
+}
+
+.sidebar-logout-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+/* ─── Page Layout Helper ──────────────────────────────────────────────────── */
+
+.admin-main-content {
+  margin-left: 260px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ─── Responsive: Collapsed Sidebar ─────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    width: 60px;
+
+  }
+
+  .admin-sidebar .sidebar-brand-text,
+  .admin-sidebar .sidebar-link-label,
+  .admin-sidebar .sidebar-section-label,
+  .admin-sidebar .sidebar-chevron,
+  .admin-sidebar .sidebar-brand-sub,
+  .admin-sidebar .sidebar-dropdown {
+    display: none;
+  }
+
+  .admin-sidebar .sidebar-link {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .admin-sidebar .sidebar-link:hover {
+    padding-left: 12px;
+  }
+
+  .admin-sidebar .sidebar-brand {
+    justify-content: center;
+    padding: 16px 12px;
+  }
+
+  .admin-sidebar .sidebar-logout {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .admin-main-content {
+    margin-left: 60px;
+  }
+}
