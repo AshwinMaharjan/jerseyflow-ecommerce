@@ -1,0 +1,31 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* Sits below the fixed navbar */
+.page-wrapper {
+    display: flex;
+    margin-top: 60px;           /* must match your navbar height exactly */
+    min-height: calc(100vh - 60px);
+    align-items: stretch;
+}
+
+/* Right side: content + footer stacked vertically */
+.page-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 60px);
+    overflow-x: hidden;
+}
+
+.content-wrapper {
+    flex: 1;                    /* grows to fill space, pushes footer down */
+    padding: 30px;
+}

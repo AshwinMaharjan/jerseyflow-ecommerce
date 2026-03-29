@@ -1,22 +1,43 @@
 /* ─── Admin Sidebar Menu ─────────────────────────────────────────────────── */
+html, body {
+  height: 100%;
+}
 
 .admin-sidebar {
-  position: fixed;
-  top: -10px;
-  left: 0;
-  width: 260px;
-  height: 100vh;
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  /* overflow-y: auto;
-  overflow-x: hidden; */
-  z-index: 100;
-  box-shadow: var(--shadow);
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-  overflow: hidden;
+    width: 260px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+    position: relative;
+    min-height: 100%;       /* ← was calc(100vh - 60px) */
+    align-self: stretch;    /* ← belt-and-suspenders */
+}
+/* Wrapper: sidebar + content side by side */
+.page-wrapper {
+    display: flex;
+    margin-top: 60px;          /* ← matches your navbar height */
+    min-height: calc(100vh - 60px);
+    align-items: stretch;
+}
+
+/* Main content area */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background: var(--bg);
+    min-height: calc(100vh - 60px);
+}
+
+/* Footer always full width, never overlapped */
+footer, .footer {
+    clear: both;
+    width: 100%;
+    margin-left: 0;
 }
 
 .admin-sidebar::-webkit-scrollbar {
@@ -193,7 +214,7 @@
 
 .sidebar-dropdown-link::before {
   content: '';
-  position: absolute;
+  /* position: absolute; */
   left: 38px;
   top: 50%;
   transform: translateY(-50%);
@@ -232,7 +253,8 @@
 /* ─── Logout ──────────────────────────────────────────────────────────────── */
 
 .sidebar-footer {
-  padding: 12px 0 16px;
+  margin-top: auto;
+  padding: 10px 0 12px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -241,7 +263,7 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 10px 20px;
+  padding: 20px 20px;
   color: rgba(192, 57, 43, 0.75);
   text-decoration: none;
   font-size: 13.5px;
@@ -267,13 +289,6 @@
 }
 
 /* ─── Page Layout Helper ──────────────────────────────────────────────────── */
-
-.admin-main-content {
-  margin-left: 260px;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-}
 
 /* ─── Responsive: Collapsed Sidebar ─────────────────────────────────────── */
 

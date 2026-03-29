@@ -1,0 +1,89 @@
+/* ─── edit_product.css ───────────────────────────────────────────────────── */
+/*
+ * This file only contains styles UNIQUE to edit_product.php.
+ * Base form styles (form-card, form-grid, form-group, etc.)
+ * are inherited from add_products.css which is loaded first.
+ */
+
+/* ── Image action row ────────────────────────────────────────────────────── */
+.image-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+/* ── Current image note ──────────────────────────────────────────────────── */
+.current-image-note {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.4;
+}
+
+.current-image-note i {
+    color: #3b82f6;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+/* ── Unsaved changes indicator ───────────────────────────────────────────── */
+.changes-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #b45309;
+    margin-top: 14px;
+    animation: pulse-warning 2s ease-in-out infinite;
+}
+
+.changes-indicator i {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.changes-indicator.hidden {
+    display: none !important;
+}
+
+@keyframes pulse-warning {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.65; }
+}
+
+/* ── Edit-specific page subtitle ─────────────────────────────────────────── */
+.page-subtitle strong {
+    color: var(--text);
+}
+
+/* ── Cancel button (overrides btn-reset from add_products.css) ───────────── */
+a.btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+a.btn-reset:hover {
+    background: var(--hover);
+    color: var(--text);
+    border-color: var(--muted);
+}
+

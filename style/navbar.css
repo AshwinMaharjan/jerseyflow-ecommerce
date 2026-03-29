@@ -55,11 +55,11 @@
   text-decoration: none;
 }
 .jf-logo img {
-  height: 140px;
+  height: 30px;
   width: auto;
   object-fit: contain;
   display: block;
-  margin-left:-80px;
+  margin-left:-20px;
 }
 
 /* ── CENTER LINKS ───────────────────────────────────────────── */

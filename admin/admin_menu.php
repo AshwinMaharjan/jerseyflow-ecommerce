@@ -30,31 +30,28 @@ function isOpen(array $pages, string $current): string {
 <aside class="admin-sidebar" id="adminSidebar">
 
   <!-- Brand -->
-  <a href="dashboard.php" class="sidebar-brand">
+  <!-- <a href="dashboard.php" class="sidebar-brand">
     <span class="sidebar-brand-icon">⚙️</span>
     <span class="sidebar-brand-text">
       <span class="sidebar-brand-name">AdminPanel</span>
       <span class="sidebar-brand-sub">Control Center</span>
     </span>
-  </a>
+  </a> -->
 
   <!-- Navigation -->
   <nav class="sidebar-nav">
 
     <!-- ── 1. Dashboard ─────────────────────────────────────────────────── -->
-    <div class="sidebar-item<?= isOpen(['dashboard', 'overview', 'analytics'], $current_page) ?>">
-      <button class="sidebar-link<?= isActive('dashboard', $current_page) ?>"
-              onclick="toggleMenu(this)">
-        <span class="sidebar-link-icon"><i class="fa-solid fa-gauge-high"></i></span>
-        <span class="sidebar-link-label">Dashboard</span>
-        <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
-      </button>
-      <div class="sidebar-dropdown">
-        <a href="dashboard.php"      class="sidebar-dropdown-link<?= isActive('dashboard', $current_page) ?>">Overview</a>
-        <a href="analytics.php"      class="sidebar-dropdown-link<?= isActive('analytics', $current_page) ?>">Analytics</a>
-        <a href="reports.php"        class="sidebar-dropdown-link<?= isActive('reports', $current_page) ?>">Reports</a>
-      </div>
-    </div>
+<div class="sidebar-item<?= isOpen(['dashboard'], $current_page) ?>">
+  <a href="admin_homepage.php"
+     class="sidebar-link<?= isActive('dashboard', $current_page) ?>">
+     
+    <span class="sidebar-link-icon">
+      <i class="fa-solid fa-gauge-high"></i>
+    </span>
+    <span class="sidebar-link-label">Dashboard</span>
+  </a>
+</div>
 
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">Catalog &amp; Sales</div>
@@ -68,10 +65,9 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="products.php"             class="sidebar-dropdown-link<?= isActive('products', $current_page) ?>">All Products</a>
-        <a href="add_product.php"          class="sidebar-dropdown-link<?= isActive('add_product', $current_page) ?>">Add New Product</a>
-        <a href="product_categories.php"   class="sidebar-dropdown-link<?= isActive('product_categories', $current_page) ?>">Categories</a>
-        <a href="product_attributes.php"   class="sidebar-dropdown-link<?= isActive('product_attributes', $current_page) ?>">Attributes &amp; Variants</a>
+        <a href="all_products.php" class="sidebar-dropdown-link"> All Products</a>
+        <a href="add_products.php" class="sidebar-dropdown-link"> Add Products</a>
+        <a href="categories.php" class="sidebar-dropdown-link"> Categories</a>
       </div>
     </div>
 
@@ -84,9 +80,13 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="orders.php"       class="sidebar-dropdown-link<?= isActive('orders', $current_page) ?>">All Orders</a>
-        <a href="shipments.php"    class="sidebar-dropdown-link<?= isActive('shipments', $current_page) ?>">Shipments</a>
-        <a href="returns.php"      class="sidebar-dropdown-link<?= isActive('returns', $current_page) ?>">Returns &amp; Refunds</a>
+        <a href="orders_management/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
+        <a href="orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
+        <a href="orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a>
+        <a href="orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
+        <a href="orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a>
+        <a href="orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a>
+
       </div>
     </div>
 
@@ -105,22 +105,6 @@ function isOpen(array $pages, string $current): string {
         <a href="users.php"      class="sidebar-dropdown-link<?= isActive('users', $current_page) ?>">All Users</a>
         <a href="add_user.php"   class="sidebar-dropdown-link<?= isActive('add_user', $current_page) ?>">Add User</a>
         <a href="user_roles.php" class="sidebar-dropdown-link<?= isActive('user_roles', $current_page) ?>">Roles &amp; Permissions</a>
-      </div>
-    </div>
-
-    <!-- ── 5. Club Management ────────────────────────────────────────────── -->
-    <div class="sidebar-item<?= isOpen(['clubs', 'club_members', 'club_events', 'club_rewards'], $current_page) ?>">
-      <button class="sidebar-link<?= isActive('clubs', $current_page) ?>"
-              onclick="toggleMenu(this)">
-        <span class="sidebar-link-icon"><i class="fa-solid fa-shield-halved"></i></span>
-        <span class="sidebar-link-label">Club Management</span>
-        <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
-      </button>
-      <div class="sidebar-dropdown">
-        <a href="clubs.php"         class="sidebar-dropdown-link<?= isActive('clubs', $current_page) ?>">All Clubs</a>
-        <a href="club_members.php"  class="sidebar-dropdown-link<?= isActive('club_members', $current_page) ?>">Members</a>
-        <a href="club_events.php"   class="sidebar-dropdown-link<?= isActive('club_events', $current_page) ?>">Events</a>
-        <a href="club_rewards.php"  class="sidebar-dropdown-link<?= isActive('club_rewards', $current_page) ?>">Rewards &amp; Points</a>
       </div>
     </div>
 
@@ -173,12 +157,10 @@ function isOpen(array $pages, string $current): string {
         <a href="flagged_reviews.php" class="sidebar-dropdown-link<?= isActive('flagged_reviews', $current_page) ?>">Flagged / Pending</a>
       </div>
     </div>
-
-  </nav><!-- /sidebar-nav -->
+  <div class="sidebar-footer">
 
   <!-- ── Footer: Logout ───────────────────────────────────────────────────── -->
-  <div class="sidebar-footer">
-    <form method="POST" action="logout.php">
+    <form method="POST" action="../logout.php">
       <?php
         // CSRF token – assumes you have session_start() called on the parent page
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -193,36 +175,8 @@ function isOpen(array $pages, string $current): string {
       </button>
     </form>
   </div>
+  </nav><!-- /sidebar-nav -->
 
 </aside><!-- /admin-sidebar -->
 
-<!-- ── Sidebar Toggle Script ─────────────────────────────────────────────── -->
-<script>
-/**
- * toggleMenu(btn)
- * Toggles the .open class on the parent .sidebar-item.
- * Other open items are closed automatically (accordion behaviour).
- */
-function toggleMenu(btn) {
-    const item    = btn.closest('.sidebar-item');
-    const isOpen  = item.classList.contains('open');
-
-    // Close all siblings first (accordion)
-    item.parentElement.querySelectorAll('.sidebar-item.open').forEach(el => {
-        el.classList.remove('open');
-    });
-
-    if (!isOpen) {
-        item.classList.add('open');
-    }
-}
-
-// Auto-open the active parent on page load
-document.addEventListener('DOMContentLoaded', () => {
-    const activeChild = document.querySelector('.sidebar-dropdown .sidebar-dropdown-link.active');
-    if (activeChild) {
-        const parentItem = activeChild.closest('.sidebar-item');
-        if (parentItem) parentItem.classList.add('open');
-    }
-});
-</script>
+<script src="../script/admin_menu.js"></script>

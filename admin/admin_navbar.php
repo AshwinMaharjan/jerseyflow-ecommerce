@@ -8,7 +8,6 @@
  * Make sure session_start() is called before including this file.
  */
 
-session_start();
 
 // Admin name (optional, adjust based on your DB/session)
 $admin_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
@@ -111,34 +110,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
   </div>
 </div>
 <!-- ═════════════════════ JS ═════════════════════ -->
-<script>
-(function () {
-
-  // Admin search
-  const searchInput = document.getElementById('adminSearchInput');
-
-  searchInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && searchInput.value.trim()) {
-      window.location.href =
-        'admin_search.php?q=' + encodeURIComponent(searchInput.value.trim());
-    }
-  });
-
-})();
-
-function openLogoutModal() {
-  document.getElementById("logoutModal").style.display = "flex";
-}
-
-function closeLogoutModal() {
-  document.getElementById("logoutModal").style.display = "none";
-}
-
-// close when clicking outside
-window.onclick = function(e) {
-  let modal = document.getElementById("logoutModal");
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
-};
-</script>
+<script src="../script/admin_navbar.js"></script>

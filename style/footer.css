@@ -26,6 +26,11 @@
   margin: 6px 0;
 }
 
+.footer-col p i {
+  margin-right: 8px;
+  color: #fff;
+}
+
 .footer-col ul {
   list-style: none;
   padding: 0;
@@ -60,7 +65,7 @@
 }
 
 .footer-logo img {
-    height: 130px;
+    height: 30px;
     width: auto;
     margin-bottom: 10px;
 }
