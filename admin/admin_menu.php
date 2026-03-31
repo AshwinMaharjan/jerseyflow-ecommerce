@@ -131,10 +131,8 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="payments.php"      class="sidebar-dropdown-link<?= isActive('payments', $current_page) ?>">All Payments</a>
-        <a href="transactions.php"  class="sidebar-dropdown-link<?= isActive('transactions', $current_page) ?>">Transaction Log</a>
-        <a href="invoices.php"      class="sidebar-dropdown-link<?= isActive('invoices', $current_page) ?>">Invoices</a>
-        <a href="payouts.php"       class="sidebar-dropdown-link<?= isActive('payouts', $current_page) ?>">Payouts</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_dashboard.php" class="sidebar-dropdown-link">Dashboard</a>
+
       </div>
     </div>
 

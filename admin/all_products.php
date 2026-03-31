@@ -7,6 +7,7 @@ $search   = trim($_GET['search']   ?? '');
 $club_id  = intval($_GET['club_id']  ?? 0);
 $size_id  = intval($_GET['size_id']  ?? 0);
 $kit_id   = intval($_GET['kit_id']   ?? 0);
+$special_type = $_GET['special_type'] ?? '';
 
 // ── Delete action ──────────────────────────────────────────────────────────
 $delete_success = '';
@@ -64,6 +65,12 @@ if ($kit_id > 0) {
     $where[]  = "p.kit_id = ?";
     $params[] = $kit_id;
     $types   .= 'i';
+}
+
+if ($special_type !== '') {
+    $where[]  = "p.special_type = ?";
+    $params[] = $special_type;
+    $types   .= 's';
 }
 
 $where_sql = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -132,7 +139,7 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                 <h1 class="page-title"><i class="fa-solid fa-box-open"></i> All Products</h1>
                 <p class="page-subtitle">
                     Showing <strong><?= $total_products ?></strong> product<?= $total_products !== 1 ? 's' : '' ?>
-                    <?= ($search || $club_id || $size_id || $kit_id) ? '— filtered results' : '' ?>
+                    <?= ($search || $club_id || $size_id || $kit_id || $special_type) ? '— filtered results' : '' ?>
                 </p>
             </div>
             <a href="add_products.php" class="btn-add">
@@ -219,6 +226,20 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                             <?php endwhile; ?>
                         </select>
                     </div>
+                    <div class="filter-group">
+    <select name="special_type" onchange="this.form.submit()">
+        <option value="">All Types</option>
+
+        <option value="retro" <?= ($special_type === 'retro') ? 'selected' : '' ?>>
+            Retro Jersey
+        </option>
+
+        <option value="worldcup_2026" <?= ($special_type === 'worldcup_2026') ? 'selected' : '' ?>>
+            World Cup 2026
+        </option>
+    </select>
+</div>
+
 
                     <!-- Search Button -->
                     <button type="submit" class="btn-filter-search">
@@ -226,8 +247,8 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                     </button>
 
                     <!-- Clear All -->
-                    <?php if ($search || $club_id || $size_id || $kit_id): ?>
-                        <a href="all_products.php" class="btn-clear-filters">
+                    <?php if ($search || $club_id || $size_id || $kit_id || $special_type): ?>
+                        <a href="/jerseyflow-ecommerce/admin/all_products.php" class="btn-clear-filters">
                             <i class="fa-solid fa-filter-circle-xmark"></i> Clear
                         </a>
                     <?php endif; ?>

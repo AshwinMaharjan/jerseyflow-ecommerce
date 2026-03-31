@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $size_id      = intval($_POST['size_id'] ?? 0);
     $kit_id       = intval($_POST['kit_id'] ?? 0);
     $description  = trim($_POST['description'] ?? '');
+    $special_type = $_POST['special_type'] ?? null;
+
     $image_path   = '';
 
     // ── VALIDATION ───────────────────────────────────────────────
@@ -108,23 +110,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $country_id_val = $country_id ?: null;
 
         $stmt = mysqli_prepare($conn,
-            "INSERT INTO products
-            (product_name, price, stock, club_id, country_id, size_id, kit_id, image, description, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
-        );
+    "INSERT INTO products
+    (product_name, price, stock, club_id, country_id, size_id, kit_id, special_type, image, description, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+);
 
-        mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
-            $product_name,
-            $price,
-            $stock,
-            $club_id_val,
-            $country_id_val,
-            $size_id,
-            $kit_id,
-            $image_path,
-            $description
-        );
-
+mysqli_stmt_bind_param($stmt, 'sdiiiissss',
+    $product_name,
+    $price,
+    $stock,
+    $club_id_val,
+    $country_id_val,
+    $size_id,
+    $kit_id,
+    $special_type,
+    $image_path,
+    $description
+);
         if (mysqli_stmt_execute($stmt)) {
 
             // ✅ GET PRODUCT ID (FIXED)
@@ -142,35 +144,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // ── GENERATE SKU ─────────────────────────────────────
             $sku = 'JF-' . str_pad($new_product_id, 5, '0', STR_PAD_LEFT) . '-' . strtoupper($size_label) . '-DEF';
 
-            // ── CREATE VARIANT (FIXED TYPES) ─────────────────────
-            $vstmt = $conn->prepare("
-                INSERT INTO product_variants (product_id, size, color, sku, stock, reorder_level, reorder_qty)
-                VALUES (?, ?, 'Default', ?, ?, 5, 20)
-            ");
+// ── CREATE VARIANT ───────────────────────────────────────────
+$vstmt = $conn->prepare("
+    INSERT INTO product_variants (product_id, size, color, sku, stock, reorder_level, reorder_qty)
+    VALUES (?, ?, 'Default', ?, 0, 5, 20)
+");
 
-            $vstmt->bind_param('issi', $new_product_id, $size_label, $sku, $stock);
-            $vstmt->execute();
+$vstmt->bind_param('iss', $new_product_id, $size_label, $sku);
+$vstmt->execute();
 
-            $variant_id = $conn->insert_id;
-            $vstmt->close();
+$variant_id = $conn->insert_id;
+$vstmt->close();
 
-            // ── STOCK MOVEMENT ───────────────────────────────────
-            if ($stock > 0 && $variant_id) {
-                require_once 'ims/ims_helpers.php';
-                $admin_id = $_SESSION['admin_id'] ?? 0;
+// ── STOCK MOVEMENT ───────────────────────────────────────────
+if ($stock > 0 && $variant_id) {
+    require_once 'ims/ims_helpers.php';
+    $admin_id = $_SESSION['admin_id'] ?? 0;
 
-                ims_stock_move(
-                    $conn,
-                    $variant_id,
-                    $admin_id,
-                    'IN',
-                    $stock,
-                    '',
-                    'Initial stock on product creation',
-                    ''
-                );
-            }
-
+    ims_stock_move(
+        $conn,
+        $variant_id,
+        $admin_id,
+        'IN',
+        $stock,
+        '',
+        'Initial stock on product creation',
+        ''
+    );
+}
             $success = 'Product <strong>' . htmlspecialchars($product_name) . '</strong> added successfully!';
             $_POST = [];
 
@@ -294,6 +295,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     Club
                                     <span class="field-hint">(or select a country)</span>
                                 </label>
+                                    <div class="select-wrapper">
+
                                 <select id="club_id" name="club_id">
                                     <option value="">-- Select Club --</option>
                                     <?php
@@ -306,6 +309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
+                                <i class="fa-solid fa-chevron-down select-icon"></i>
+                            </div>
                             </div>
 
                             <div class="form-group">
@@ -313,6 +318,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     Country
                                     <span class="field-hint">(or select a club)</span>
                                 </label>
+                                                                    <div class="select-wrapper">
+
                                 <select id="country_id" name="country_id">
                                     <option value="">-- Select Country --</option>
                                     <?php
@@ -325,8 +332,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
+                                <i class="fa-solid fa-chevron-down select-icon"></i>
                                 <!-- Error shown below country (right cell) -->
                                 <span class="field-error" id="club-country-error"></span>
+                            </div>
                             </div>
 
                         </div><!-- /form-row-2 club-country -->
@@ -338,6 +347,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="size_id">
                                     Size <span class="required">*</span>
                                 </label>
+                                                                    <div class="select-wrapper">
+
                                 <select id="size_id" name="size_id" required>
                                     <option value="">-- Select Size --</option>
                                     <?php
@@ -350,12 +361,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
+                                <i class="fa-solid fa-chevron-down select-icon"></i>
+                            </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="kit_id">
                                     Kit <span class="required">*</span>
                                 </label>
+                                                                    <div class="select-wrapper">
+
                                 <select id="kit_id" name="kit_id" required>
                                     <option value="">-- Select Kit --</option>
                                     <?php
@@ -368,10 +383,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
+                                <i class="fa-solid fa-chevron-down select-icon"></i>
+                            </div>
                             </div>
 
                         </div><!-- /form-row-2 size-kit -->
+<div class="form-group">
+    <label for="special_type">
+        Special Category
+        <span class="field-hint">(optional)</span>
+    </label>
 
+<div class="select-wrapper">
+    <select id="special_type" name="special_type">
+        <option value="">-- None --</option>
+
+        <option value="retro"
+            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'retro') ? 'selected' : '' ?>>
+            Retro Jersey
+        </option>
+
+        <option value="worldcup_2026"
+            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'worldcup_2026') ? 'selected' : '' ?>>
+            World Cup 2026 Jersey
+        </option>
+    </select>
+
+    <i class="fa-solid fa-chevron-down select-icon"></i>
+</div>
+</div>
                         <!-- Description -->
                         <div class="form-group">
                             <label for="description">Description</label>
@@ -472,3 +512,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+

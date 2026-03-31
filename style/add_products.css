@@ -165,7 +165,6 @@
 
 .form-group select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 36px;
@@ -475,4 +474,90 @@ input:invalid:not(:placeholder-shown),
 select:invalid:not(:placeholder-shown) {
     border-color: rgba(239, 68, 68, 0.6);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ─── Special Category Dropdown (Matching Kit/Size Style) ─────────────── */
+
+.form-group select[name="special_type"] {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13.5px;
+    font-family: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    outline: none;
+    cursor: pointer;
+
+    /* same dropdown arrow style as your other selects */
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Focus state (same as your system) */
+.form-group select[name="special_type"]:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+}
+
+/* Optional: make "None" look slightly muted */
+.form-group select[name="special_type"] option[value=""] {
+    color: var(--muted);
+}
+
+/* ─── Select Wrapper Fix (REQUIRED) ───────────────────────── */
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* your existing select styling stays same, but ensure padding-right */
+.select-wrapper select {
+    width: 100%;
+    padding: 10px 14px;
+    padding-right: 40px;
+
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    color: var(--text);
+    font-size: 13.5px;
+    font-family: inherit;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    outline: none;
+    cursor: pointer;
+}
+
+/* dropdown icon */
+.select-wrapper .select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-size: 13px;
+    color: var(--muted);
+
+    pointer-events: none;
+}
+
+/* hover effect */
+.select-wrapper:hover .select-icon {
+    color: var(--text);
+}
+
+/* focus effect */
+.select-wrapper select:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
 }
