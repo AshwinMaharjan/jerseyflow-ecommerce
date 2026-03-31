@@ -26,7 +26,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
   <!-- ── Logo ─────────────────────────────────────────────────── -->
   <a href="homepage.php" class="jf-logo" aria-label="JerseyFlow Home">
-    <img src="images/logo.png" alt="JerseyFlow Logo" />
+    <img src="/jerseyflow-ecommerce/images/logo.png" alt="JerseyFlow Admin" />
   </a>
 
   <!-- ── Center Links ──────────────────────────────────────────── -->

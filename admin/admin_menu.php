@@ -43,8 +43,7 @@ function isOpen(array $pages, string $current): string {
 
     <!-- ── 1. Dashboard ─────────────────────────────────────────────────── -->
 <div class="sidebar-item<?= isOpen(['dashboard'], $current_page) ?>">
-  <a href="admin_homepage.php"
-     class="sidebar-link<?= isActive('dashboard', $current_page) ?>">
+<a href="/jerseyflow-ecommerce/admin/admin_homepage.php"     class="sidebar-link<?= isActive('dashboard', $current_page) ?>">
      
     <span class="sidebar-link-icon">
       <i class="fa-solid fa-gauge-high"></i>
@@ -65,10 +64,9 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="all_products.php" class="sidebar-dropdown-link"> All Products</a>
-        <a href="add_products.php" class="sidebar-dropdown-link"> Add Products</a>
-        <a href="categories.php" class="sidebar-dropdown-link"> Categories</a>
-      </div>
+<a href="/jerseyflow-ecommerce/admin/all_products.php" class="sidebar-dropdown-link"> All Products</a>
+<a href="/jerseyflow-ecommerce/admin/add_products.php" class="sidebar-dropdown-link"> Add Products</a>
+<a href="/jerseyflow-ecommerce/admin/categories.php" class="sidebar-dropdown-link"> Categories</a>      </div>
     </div>
 
     <!-- ── 3. Orders Management ──────────────────────────────────────────── -->
@@ -80,12 +78,12 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="orders_management/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
-        <a href="orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
-        <a href="orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a>
-        <a href="orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
-        <a href="orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a>
-        <a href="orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a>
 
       </div>
     </div>
@@ -94,18 +92,11 @@ function isOpen(array $pages, string $current): string {
     <div class="sidebar-section-label">People</div>
 
     <!-- ── 4. Users Management ───────────────────────────────────────────── -->
-    <div class="sidebar-item<?= isOpen(['users', 'add_user', 'user_roles'], $current_page) ?>">
-      <button class="sidebar-link<?= isActive('users', $current_page) ?>"
-              onclick="toggleMenu(this)">
-        <span class="sidebar-link-icon"><i class="fa-solid fa-users"></i></span>
+    <div class="sidebar-item">
+<button class="sidebar-link" onclick="window.location.href='/jerseyflow-ecommerce/admin/users.php'">
+          <span class="sidebar-link-icon"><i class="fa-solid fa-users"></i></span>
         <span class="sidebar-link-label">Users Management</span>
-        <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
-      <div class="sidebar-dropdown">
-        <a href="users.php"      class="sidebar-dropdown-link<?= isActive('users', $current_page) ?>">All Users</a>
-        <a href="add_user.php"   class="sidebar-dropdown-link<?= isActive('add_user', $current_page) ?>">Add User</a>
-        <a href="user_roles.php" class="sidebar-dropdown-link<?= isActive('user_roles', $current_page) ?>">Roles &amp; Permissions</a>
-      </div>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -120,10 +111,14 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="inventory.php"       class="sidebar-dropdown-link<?= isActive('inventory', $current_page) ?>">Stock Overview</a>
-        <a href="stock_alerts.php"    class="sidebar-dropdown-link<?= isActive('stock_alerts', $current_page) ?>">Low-Stock Alerts</a>
-        <a href="suppliers.php"       class="sidebar-dropdown-link<?= isActive('suppliers', $current_page) ?>">Suppliers</a>
-        <a href="purchase_orders.php" class="sidebar-dropdown-link<?= isActive('purchase_orders', $current_page) ?>">Purchase Orders</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_dashboard.php" class="sidebar-dropdown-link">Dashboard</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_stock_levels.php" class="sidebar-dropdown-link">Stock Levels</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_movements.php" class="sidebar-dropdown-link">Stock Movement</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_adjust.php" class="sidebar-dropdown-link">Adjust Stock </a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_low_stock.php" class="sidebar-dropdown-link">Low Stock Alerts</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_reorder.php" class="sidebar-dropdown-link">Reorder Management</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_reports.php" class="sidebar-dropdown-link">Inventory Reports</a>
+
       </div>
     </div>
 

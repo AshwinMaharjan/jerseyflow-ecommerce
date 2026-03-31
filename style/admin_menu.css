@@ -11,7 +11,7 @@ html, body {
     flex-direction: column;
     overflow-y: auto;
     z-index: 100;
-    box-shadow: var(--shadow);
+    /* box-shadow: var(--shadow); */
     flex-shrink: 0;
     position: relative;
     min-height: 100%;       /* ← was calc(100vh - 60px) */

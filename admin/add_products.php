@@ -2,7 +2,7 @@
 session_start();
 include('connect.php');
 
-// ── Fetch dropdown data ────────────────────────────────────────────────────
+// ── Fetch dropdown data ─────────────────────────────────────────
 $clubs_result     = mysqli_query($conn, "SELECT club_id, club_name FROM clubs ORDER BY club_name ASC");
 $sizes_result     = mysqli_query($conn, "SELECT size_id, size_name FROM sizes ORDER BY sort_order ASC");
 $kits_result      = mysqli_query($conn, "SELECT kit_id, kit_name FROM kits ORDER BY sort_order ASC");
@@ -11,132 +11,175 @@ $countries_result = mysqli_query($conn, "SELECT country_id, country_name FROM co
 $success = '';
 $error   = '';
 
-// ── Process POST ───────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Raw inputs
     $product_name = trim($_POST['product_name'] ?? '');
-    $raw_price    = $_POST['price']      ?? '';
-    $raw_stock    = $_POST['stock']      ?? '';
-    $club_id      = intval($_POST['club_id']     ?? 0);
-    $country_id   = intval($_POST['country_id']  ?? 0);
-    $size_id      = intval($_POST['size_id']     ?? 0);
-    $kit_id       = intval($_POST['kit_id']      ?? 0);
-    $description  = trim($_POST['description']   ?? '');
+    $raw_price    = $_POST['price'] ?? '';
+    $raw_stock    = $_POST['stock'] ?? '';
+    $club_id      = intval($_POST['club_id'] ?? 0);
+    $country_id   = intval($_POST['country_id'] ?? 0);
+    $size_id      = intval($_POST['size_id'] ?? 0);
+    $kit_id       = intval($_POST['kit_id'] ?? 0);
+    $description  = trim($_POST['description'] ?? '');
     $image_path   = '';
 
-    // ── Validate: product name ─────────────────────────────────────
+    // ── VALIDATION ───────────────────────────────────────────────
+
     if (empty($product_name) || strlen($product_name) > 255) {
         $error = 'Product name is required and must be under 255 characters.';
     }
 
-    // ── Validate: price (numeric, 500–20,000) ──────────────────────
     elseif (!is_numeric($raw_price) || ($price = floatval($raw_price)) < 500 || $price > 20000) {
-        $error = 'Price must be a number between Rs. 500 and Rs. 20,000.';
+        $error = 'Price must be between Rs. 500 and Rs. 20,000.';
     }
 
-    // ── Validate: stock (non-negative integer, 0–500) ──────────────
-    elseif (
-        !preg_match('/^\d+$/', trim($raw_stock)) ||
-        ($stock = intval($raw_stock)) < 0 ||
-        $stock > 500
-    ) {
+    elseif (!preg_match('/^\d+$/', trim($raw_stock)) || ($stock = intval($raw_stock)) > 500) {
         $error = 'Stock must be a whole number between 0 and 500.';
     }
 
-    // ── Validate: club OR country (at least one required) ──────────
     elseif (!$club_id && !$country_id) {
-        $error = 'Please select at least one — a Club or a Country.';
+        $error = 'Select at least one: Club or Country.';
     }
 
-    // ── Validate: size & kit ───────────────────────────────────────
+    // optional strict rule
+    elseif ($club_id && $country_id) {
+        $error = 'Select either Club OR Country, not both.';
+    }
+
     elseif (!$size_id) {
-        $error = 'Please select a Size.';
+        $error = 'Select a size.';
     }
 
     elseif (!$kit_id) {
-        $error = 'Please select a Kit.';
+        $error = 'Select a kit.';
     }
 
     elseif (empty($_FILES['image']['name'])) {
-    $error = 'Product image is required.';
-}
+        $error = 'Product image is required.';
+    }
 
-    else {
-        // ── Image upload ───────────────────────────────────────────
-        if (!empty($_FILES['image']['name'])) {
-            $upload_dir   = '../uploads/products/';
-            $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
-            $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
-            $max_size     = 2 * 1024 * 1024; // 2 MB
+    // ── IMAGE UPLOAD ─────────────────────────────────────────────
+    if (empty($error)) {
 
-            $file_ext  = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $file_size = $_FILES['image']['size'];
-            $file_tmp  = $_FILES['image']['tmp_name'];
+        $upload_dir   = '../uploads/products/';
+        $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
+        $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
+        $max_size     = 2 * 1024 * 1024;
 
-            // Verify actual MIME type, not just extension
+        $file_tmp  = $_FILES['image']['tmp_name'];
+        $file_name = $_FILES['image']['name'];
+        $file_size = $_FILES['image']['size'];
+
+        if (!is_uploaded_file($file_tmp)) {
+            $error = 'Invalid file upload.';
+        } else {
+            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime  = finfo_file($finfo, $file_tmp);
             finfo_close($finfo);
 
             if (!in_array($file_ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
-                $error = 'Invalid image format. Allowed: JPG, PNG, WEBP.';
+                $error = 'Invalid image format.';
             } elseif ($file_size > $max_size) {
-                $error = 'Image must be under 2 MB.';
+                $error = 'Image must be under 2MB.';
             } else {
+
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0755, true);
                 }
+
                 $new_filename = uniqid('product_', true) . '.' . $file_ext;
-                $dest         = $upload_dir . $new_filename;
+                $dest = $upload_dir . $new_filename;
 
                 if (!move_uploaded_file($file_tmp, $dest)) {
-                    $error = 'Failed to upload image. Check folder permissions.';
+                    $error = 'Upload failed.';
                 } else {
                     $image_path = $new_filename;
                 }
             }
         }
+    }
 
-        // ── Insert into DB ─────────────────────────────────────────
-        if (empty($error)) {
-            // NULL-safe: 0 becomes NULL for optional FK columns
-            $club_id_val    = $club_id    ?: null;
-            $country_id_val = $country_id ?: null;
+    // ── INSERT PRODUCT ───────────────────────────────────────────
+    if (empty($error)) {
 
-            $stmt = mysqli_prepare($conn,
-                "INSERT INTO products
-                    (product_name, price, stock, club_id, country_id, size_id, kit_id, image, description, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
-            );
+        $club_id_val    = $club_id ?: null;
+        $country_id_val = $country_id ?: null;
 
-            mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
-                $product_name,
-                $price,
-                $stock,
-                $club_id_val,
-                $country_id_val,
-                $size_id,
-                $kit_id,
-                $image_path,
-                $description
-            );
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO products
+            (product_name, price, stock, club_id, country_id, size_id, kit_id, image, description, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        );
 
-            if (mysqli_stmt_execute($stmt)) {
-                $success = 'Product <strong>' . htmlspecialchars($product_name) . '</strong> added successfully!';
-                $_POST   = []; // clear form
-            } else {
-                $errno = mysqli_errno($conn);
-                // MySQL error 3819 = CHECK constraint violated
-                if ($errno === 3819) {
-                    $error = 'A value was rejected by the database. Ensure price is Rs. 500–20,000 and stock is 0–500.';
-                } else {
-                    $error = 'A database error occurred. Please try again.';
-                    error_log('[add_products] DB error ' . $errno . ': ' . mysqli_error($conn));
-                }
+        mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
+            $product_name,
+            $price,
+            $stock,
+            $club_id_val,
+            $country_id_val,
+            $size_id,
+            $kit_id,
+            $image_path,
+            $description
+        );
+
+        if (mysqli_stmt_execute($stmt)) {
+
+            // ✅ GET PRODUCT ID (FIXED)
+            $new_product_id = mysqli_insert_id($conn);
+
+            // ── GET SIZE LABEL ────────────────────────────────────
+            $size_label = 'M';
+            $sr = $conn->prepare("SELECT size_name FROM sizes WHERE size_id = ?");
+            $sr->bind_param('i', $size_id);
+            $sr->execute();
+            $res = $sr->get_result()->fetch_assoc();
+            if ($res) $size_label = $res['size_name'];
+            $sr->close();
+
+            // ── GENERATE SKU ─────────────────────────────────────
+            $sku = 'JF-' . str_pad($new_product_id, 5, '0', STR_PAD_LEFT) . '-' . strtoupper($size_label) . '-DEF';
+
+            // ── CREATE VARIANT (FIXED TYPES) ─────────────────────
+            $vstmt = $conn->prepare("
+                INSERT INTO product_variants (product_id, size, color, sku, stock, reorder_level, reorder_qty)
+                VALUES (?, ?, 'Default', ?, ?, 5, 20)
+            ");
+
+            $vstmt->bind_param('issi', $new_product_id, $size_label, $sku, $stock);
+            $vstmt->execute();
+
+            $variant_id = $conn->insert_id;
+            $vstmt->close();
+
+            // ── STOCK MOVEMENT ───────────────────────────────────
+            if ($stock > 0 && $variant_id) {
+                require_once 'ims/ims_helpers.php';
+                $admin_id = $_SESSION['admin_id'] ?? 0;
+
+                ims_stock_move(
+                    $conn,
+                    $variant_id,
+                    $admin_id,
+                    'IN',
+                    $stock,
+                    '',
+                    'Initial stock on product creation',
+                    ''
+                );
             }
-            mysqli_stmt_close($stmt);
+
+            $success = 'Product <strong>' . htmlspecialchars($product_name) . '</strong> added successfully!';
+            $_POST = [];
+
+        } else {
+            $error = 'Database error.';
+            error_log(mysqli_error($conn));
         }
+
+        mysqli_stmt_close($stmt);
     }
 }
 ?>

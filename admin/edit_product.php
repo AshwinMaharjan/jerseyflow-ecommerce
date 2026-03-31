@@ -2,7 +2,6 @@
 session_start();
 include('connect.php');
 
-// ── Guard: require a valid product ID ─────────────────────────────────────
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: all_products.php');
     exit();
@@ -10,27 +9,26 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $product_id = intval($_GET['id']);
 
-// ── Fetch existing product ─────────────────────────────────────────────────
-$fetch_stmt = mysqli_prepare($conn,
-    "SELECT p.*, c.club_name, s.size_name, k.kit_name
-     FROM products p
-     LEFT JOIN clubs c ON p.club_id = c.club_id
-     LEFT JOIN sizes s ON p.size_id = s.size_id
-     LEFT JOIN kits  k ON p.kit_id  = k.kit_id
-     WHERE p.product_id = ?"
-);
-mysqli_stmt_bind_param($fetch_stmt, 'i', $product_id);
-mysqli_stmt_execute($fetch_stmt);
-$fetch_result = mysqli_stmt_get_result($fetch_stmt);
-$product = mysqli_fetch_assoc($fetch_result);
-mysqli_stmt_close($fetch_stmt);
+// ── Fetch product ─────────────────────────────────────────────
+$stmt = $conn->prepare("
+    SELECT p.*, c.club_name, s.size_name, k.kit_name
+    FROM products p
+    LEFT JOIN clubs c ON p.club_id = c.club_id
+    LEFT JOIN sizes s ON p.size_id = s.size_id
+    LEFT JOIN kits k ON p.kit_id = k.kit_id
+    WHERE p.product_id = ?
+");
+$stmt->bind_param('i', $product_id);
+$stmt->execute();
+$product = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
 if (!$product) {
     header('Location: all_products.php');
     exit();
 }
 
-// ── Fetch dropdowns ────────────────────────────────────────────────────────
+// dropdowns
 $clubs_result = mysqli_query($conn, "SELECT club_id, club_name FROM clubs ORDER BY club_name ASC");
 $sizes_result = mysqli_query($conn, "SELECT size_id, size_name FROM sizes ORDER BY sort_order ASC");
 $kits_result  = mysqli_query($conn, "SELECT kit_id, kit_name FROM kits ORDER BY sort_order ASC");
@@ -38,99 +36,171 @@ $kits_result  = mysqli_query($conn, "SELECT kit_id, kit_name FROM kits ORDER BY 
 $success = '';
 $error   = '';
 
-// ── Handle POST (update) ───────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $product_name = trim(mysqli_real_escape_string($conn, $_POST['product_name']));
+    $product_name = trim($_POST['product_name']);
     $price        = floatval($_POST['price']);
     $stock        = intval($_POST['stock']);
     $club_id      = intval($_POST['club_id']);
     $size_id      = intval($_POST['size_id']);
     $kit_id       = intval($_POST['kit_id']);
-    $description  = trim(mysqli_real_escape_string($conn, $_POST['description']));
+    $description  = trim($_POST['description']);
     $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === '1';
 
-    // ── Validation ────────────────────────────────────────────────
-    if (empty($product_name) || $price <= 0 || $stock < 0 || !$club_id || !$size_id || !$kit_id) {
-        $error = 'Please fill in all required fields with valid values.';
-    } else {
+    // ── VALIDATION ─────────────────────────────────────────
+    if (empty($product_name) || $price < 500 || $price > 20000 || $stock < 0 || $stock > 500) {
+        $error = 'Invalid input values.';
+    } elseif (!$club_id || !$size_id || !$kit_id) {
+        $error = 'Please fill all required fields.';
+    }
 
-        $new_image = $product['image']; // keep existing by default
+    // ── IMAGE HANDLING ─────────────────────────────────────
+    $new_image = $product['image'];
 
-        // ── Remove image explicitly requested ──────────────────────
+    if (empty($error)) {
+
+        $upload_dir   = '../uploads/products/';
+        $allowed_ext  = ['jpg','jpeg','png','webp'];
+        $allowed_mime = ['image/jpeg','image/png','image/webp'];
+        $max_size     = 2 * 1024 * 1024;
+
         if ($remove_image) {
             if (!empty($product['image'])) {
-                $old_file = '../uploads/products/' . $product['image'];
-                if (file_exists($old_file)) unlink($old_file);
+                @unlink($upload_dir . $product['image']);
             }
             $new_image = '';
         }
 
-        // ── New image uploaded ─────────────────────────────────────
         if (!empty($_FILES['image']['name'])) {
-            $upload_dir  = '../uploads/products/';
-            $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
-            $max_size    = 2 * 1024 * 1024;
 
-            $file_ext  = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $file_size = $_FILES['image']['size'];
-            $file_tmp  = $_FILES['image']['tmp_name'];
+            $tmp  = $_FILES['image']['tmp_name'];
+            $name = $_FILES['image']['name'];
+            $size = $_FILES['image']['size'];
 
-            if (!in_array($file_ext, $allowed_ext)) {
-                $error = 'Invalid image format. Allowed: JPG, JPEG, PNG, WEBP.';
-            } elseif ($file_size > $max_size) {
-                $error = 'Image size must be under 2MB.';
+            if (!is_uploaded_file($tmp)) {
+                $error = 'Invalid upload.';
             } else {
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
 
-                $new_filename = uniqid('product_', true) . '.' . $file_ext;
-                $dest         = $upload_dir . $new_filename;
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 
-                if (move_uploaded_file($file_tmp, $dest)) {
-                    // Delete old image file
-                    if (!empty($product['image'])) {
-                        $old_file = $upload_dir . $product['image'];
-                        if (file_exists($old_file)) unlink($old_file);
-                    }
-                    $new_image = $new_filename;
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime  = finfo_file($finfo, $tmp);
+                finfo_close($finfo);
+
+                if (!in_array($ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
+                    $error = 'Invalid image format.';
+                } elseif ($size > $max_size) {
+                    $error = 'Image too large.';
                 } else {
-                    $error = 'Failed to upload image. Check folder permissions.';
+
+                    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+
+                    $filename = uniqid('product_', true) . '.' . $ext;
+                    $dest = $upload_dir . $filename;
+
+                    if (move_uploaded_file($tmp, $dest)) {
+                        if (!empty($product['image'])) {
+                            @unlink($upload_dir . $product['image']);
+                        }
+                        $new_image = $filename;
+                    } else {
+                        $error = 'Upload failed.';
+                    }
                 }
             }
         }
+    }
 
-        // ── UPDATE ────────────────────────────────────────────────
-        if (empty($error)) {
-            $upd_stmt = mysqli_prepare($conn,
-                "UPDATE products
-                 SET product_name = ?, price = ?, stock = ?,
-                     club_id = ?, size_id = ?, kit_id = ?,
-                     image = ?, description = ?
-                 WHERE product_id = ?"
-            );
-            mysqli_stmt_bind_param($upd_stmt, 'sdiiiissi',
-                $product_name, $price, $stock,
-                $club_id, $size_id, $kit_id,
-                $new_image, $description,
-                $product_id
-            );
+    // ── UPDATE PRODUCT ─────────────────────────────────────
+    if (empty($error)) {
 
-            if (mysqli_stmt_execute($upd_stmt)) {
-                $success = 'Product <strong>' . htmlspecialchars($product_name) . '</strong> updated successfully!';
-                // Refresh $product so form shows updated values
-                $product['product_name'] = $product_name;
-                $product['price']        = $price;
-                $product['stock']        = $stock;
-                $product['club_id']      = $club_id;
-                $product['size_id']      = $size_id;
-                $product['kit_id']       = $kit_id;
-                $product['image']        = $new_image;
-                $product['description']  = $description;
-            } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+        // get old stock BEFORE update
+        $old_stock = (int)$product['stock'];
+
+        $upd = $conn->prepare("
+            UPDATE products
+            SET product_name=?, price=?, stock=?, club_id=?, size_id=?, kit_id=?, image=?, description=?
+            WHERE product_id=?
+        ");
+
+        $upd->bind_param(
+            'sdiiiissi',
+            $product_name,
+            $price,
+            $stock,
+            $club_id,
+            $size_id,
+            $kit_id,
+            $new_image,
+            $description,
+            $product_id
+        );
+
+        if ($upd->execute()) {
+
+            // ── UPDATE VARIANT ─────────────────────────────
+            $size_label = 'M';
+            $sr = $conn->prepare("SELECT size_name FROM sizes WHERE size_id=?");
+            $sr->bind_param('i', $size_id);
+            $sr->execute();
+            $res = $sr->get_result()->fetch_assoc();
+            if ($res) $size_label = $res['size_name'];
+            $sr->close();
+
+            $vr = $conn->prepare("SELECT variant_id FROM product_variants WHERE product_id=? LIMIT 1");
+            $vr->bind_param('i', $product_id);
+            $vr->execute();
+            $vrow = $vr->get_result()->fetch_assoc();
+            $vr->close();
+
+            if ($vrow) {
+
+                // update variant stock + size
+                $vupdate = $conn->prepare("
+                    UPDATE product_variants
+                    SET size=?, stock=?
+                    WHERE variant_id=?
+                ");
+                $vupdate->bind_param('sii', $size_label, $stock, $vrow['variant_id']);
+                $vupdate->execute();
+                $vupdate->close();
+
+                // ── STOCK MOVEMENT (AFTER SUCCESS) ─────────
+                if ($stock !== $old_stock) {
+                    require_once 'ims/ims_helpers.php';
+
+                    $admin_id = $_SESSION['admin_id'] ?? 0;
+
+                    ims_stock_move(
+                        $conn,
+                        $vrow['variant_id'],
+                        $admin_id,
+                        'ADJUST',
+                        $stock,
+                        '',
+                        'Stock updated via edit product',
+                        ''
+                    );
+                }
             }
-            mysqli_stmt_close($upd_stmt);
+
+            $success = 'Product updated successfully.';
+
+            // refresh local product
+            $product['product_name'] = $product_name;
+            $product['price']       = $price;
+            $product['stock']       = $stock;
+            $product['club_id']     = $club_id;
+            $product['size_id']     = $size_id;
+            $product['kit_id']      = $kit_id;
+            $product['image']       = $new_image;
+            $product['description'] = $description;
+
+        } else {
+            $error = 'Database update failed.';
         }
+
+        $upd->close();
     }
 }
 ?>

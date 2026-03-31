@@ -26,7 +26,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
   <!-- ── LEFT: BRAND ───────────────────────────── -->
   <div class="admin-logo">
     <a href="admin_homepage.php">
-      <img src="../images/logo.png" alt="JerseyFlow Admin" />
+      <img src="/jerseyflow-ecommerce/images/logo.png" alt="JerseyFlow Admin" />
     </a>
   </div>
 

@@ -68,7 +68,7 @@
   <div class="footer-middle">
 
     <div class="footer-logo">
-      <img src="../images/logo.png" alt="JerseyFlow Logo">
+      <img src="/jerseyflow-ecommerce/images/logo.png" alt="JerseyFlow Admin" />
     </div>
 
     <!-- Social Icons -->
