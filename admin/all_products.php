@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('connect.php');
+require_once 'auth_guard.php';
+
 
 // ── Filters from GET ───────────────────────────────────────────────────────
 $search   = trim($_GET['search']   ?? '');
@@ -17,18 +19,20 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $del_id = intval($_GET['delete']);
 
     // Fetch image filename before deleting so we can remove the file
-    $img_res = mysqli_query($conn, "SELECT image FROM products WHERE product_id = $del_id");
-    $img_row = mysqli_fetch_assoc($img_res);
+    // Fetch ALL images for this product so we can delete the files
+$img_res = mysqli_query($conn, "SELECT image_path FROM product_images WHERE product_id = $del_id");
+
 
     $del_stmt = mysqli_prepare($conn, "DELETE FROM products WHERE product_id = ?");
     mysqli_stmt_bind_param($del_stmt, 'i', $del_id);
 
     if (mysqli_stmt_execute($del_stmt)) {
         // Remove image file if it exists
-        if (!empty($img_row['image'])) {
-            $img_file = '../uploads/products/' . $img_row['image'];
-            if (file_exists($img_file)) unlink($img_file);
-        }
+        // NEW — delete all image files for this product
+while ($img_row = mysqli_fetch_assoc($img_res)) {
+    $img_file = '../uploads/products/' . $img_row['image_path'];
+    if (file_exists($img_file)) unlink($img_file);
+}
         $delete_success = 'Product deleted successfully.';
     } else {
         $delete_error = 'Failed to delete product.';
@@ -81,16 +85,18 @@ $sql = "
         p.product_name,
         p.price,
         p.stock,
-        p.image,
         p.description,
         p.created_at,
         c.club_name,
         s.size_name,
-        k.kit_name
+        k.kit_name,
+        pi.image_path AS image
     FROM products p
     LEFT JOIN clubs c ON p.club_id = c.club_id
     LEFT JOIN sizes s ON p.size_id = s.size_id
     LEFT JOIN kits  k ON p.kit_id  = k.kit_id
+    LEFT JOIN product_images pi
+        ON pi.product_id = p.product_id AND pi.is_primary = 1
     $where_sql
     ORDER BY p.created_at DESC
 ";

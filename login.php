@@ -1,4 +1,18 @@
-<?php session_start(); ?>
+<?php
+session_start();
+
+// If already logged in, redirect straight to their area
+if (isset($_SESSION['user_id'], $_SESSION['role'])) {
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: admin/admin_homepage.php');
+    } else {
+        header('Location: users/users_homepage.php');
+    }
+    exit;
+}
+
+$reason = $_GET['reason'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +25,7 @@
 
 <?php include("navbar.php"); ?>
 
-<!-- ✅ SUCCESS POPUP (CENTER LIKE REGISTER) -->
+<!-- SUCCESS POPUP -->
 <div id="loginSuccessBox">
   <div class="success-content">
 
@@ -41,6 +55,20 @@
 
     <h2>Welcome Back</h2>
 
+    <!-- ── Unauthorized redirect alert ─────────────────── -->
+    <?php if ($reason === 'unauthorized'): ?>
+      <div class="alert-unauthorized">
+        🔒 Please log in as an admin to access that page.
+      </div>
+    <?php endif; ?>
+
+    <!-- ── Generic error (e.g. future use) ─────────────── -->
+    <?php if ($reason === 'session_expired'): ?>
+      <div class="alert-unauthorized">
+        ⏱ Your session has expired. Please log in again.
+      </div>
+    <?php endif; ?>
+
     <form id="loginForm">
 
       <div class="input-group">
@@ -59,7 +87,7 @@
       <button type="submit" class="btn">Login</button>
 
       <p class="register-link">
-        Don’t have an account?
+        Don't have an account?
         <a href="register.php">Register now</a>
       </p>
 

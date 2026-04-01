@@ -1,171 +1,552 @@
 /* ============================================================
-   JerseyFlow — World Cup Section
+   JerseyFlow — World Cup 2026 Section + Modal
+   File: worldcup_section.css
    ============================================================ */
 
-.jf-worldcup {
-  background: #0f0f0f;
-  padding: 80px 40px;
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+  --wc-bg:          #0a0a0a;
+  --wc-card-bg:     #141414;
+  --wc-card-hover:  #1c1c1c;
+  --wc-accent:      #8b1a1a;
+  --wc-accent-lit:  #b52020;
+  --wc-gold:        #c9a84c;
+  --wc-cream:       #EEE5D8;
+  --wc-muted:       rgba(255,255,255,0.38);
+  --wc-border:      rgba(255,255,255,0.08);
+  --wc-radius:      14px;
+  --wc-transition:  0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Layout */
+/* ── SECTION WRAPPER ── */
+.jf-worldcup {
+  background: var(--wc-bg);
+  padding: 90px 48px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Subtle background texture */
+.jf-worldcup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 50%, rgba(139,26,26,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ── LAYOUT GRID ── */
 .jf-worldcup__container {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 60px;
-  max-width: 1200px;
-  margin: auto;
+  grid-template-columns: 320px 1fr;
+  gap: 64px;
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-/* LEFT SIDE */
-.jf-worldcup__left h2 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 2.4rem;
-  text-transform: uppercase;
-  color: #EEE5D8;
-}
-
-.jf-worldcup__left span {
-  color: #681010;
-}
-
-.jf-worldcup__sub {
-  color: rgba(255,255,255,.4);
-  letter-spacing: .2em;
-  font-size: .8rem;
-  margin-bottom: 10px;
-}
-
-.jf-worldcup__desc {
-  color: rgba(255,255,255,.6);
-  margin: 20px 0;
-  line-height: 1.6;
-  text-align: center;
-}
-
-/* CTA */
-.jf-worldcup__cta {
-  display: inline-block;
-  margin-bottom: 30px;
-  padding: 10px 20px;
-  background: #681010;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: .3s;
-}
-
-.jf-worldcup__cta:hover {
-  background: #8a1414;
-}
-
-/* FILTERS */
-.jf-worldcup__filters {
+/* ── LEFT PANEL ── */
+.jf-worldcup__left {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.jf-worldcup__filters button {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.2);
-  color: #ccc;
-  padding: 6px 14px;
-  cursor: pointer;
-  border-radius: 20px;
-  transition: .3s;
-}
-
-.jf-worldcup__filters button.active,
-.jf-worldcup__filters button:hover {
-  background: #681010;
-  color: #fff;
-  border-color: #681010;
-}
-
-/* RIGHT GRID */
-.jf-worldcup__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-/* PRODUCT CARD */
-.jf-product-card {
-  background: #181818;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: .3s;
-  cursor: pointer;
-}
-
-.jf-product-card:hover {
-  transform: translateY(-6px);
-}
-
-/* IMAGE */
-.jf-product-card__img {
+  flex-direction: column;
+  justify-content: flex-start;
   position: relative;
 }
 
+/* Eyebrow label */
+.jf-worldcup__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.jf-eyebrow__line {
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--wc-gold);
+  border-radius: 2px;
+}
+.jf-eyebrow__text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--wc-gold);
+}
+
+/* Main heading */
+.jf-worldcup__heading {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(2.4rem, 3.5vw, 3.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.0;
+  color: var(--wc-cream);
+  margin: 0 0 22px 0;
+  letter-spacing: 0.01em;
+}
+.jf-worldcup__heading span {
+  color: var(--wc-accent);
+  display: block;
+}
+
+/* Description */
+.jf-worldcup__desc {
+  color: var(--wc-muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  margin-bottom: 28px;
+  max-width: 300px;
+}
+
+/* CTA button */
+.jf-worldcup__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px;
+  background: var(--wc-accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: var(--wc-transition);
+  margin-bottom: 36px;
+  width: fit-content;
+}
+.jf-worldcup__cta svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+.jf-worldcup__cta:hover {
+  background: var(--wc-accent-lit);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.4);
+}
+.jf-worldcup__cta:hover svg {
+  transform: translateX(4px);
+}
+
+/* Filter buttons */
+.jf-worldcup__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.jf-filter-btn {
+  background: transparent;
+  border: 1px solid var(--wc-border);
+  color: var(--wc-muted);
+  padding: 7px 16px;
+  cursor: pointer;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--wc-transition);
+}
+.jf-filter-btn.active,
+.jf-filter-btn:hover {
+  background: var(--wc-accent);
+  color: #fff;
+  border-color: var(--wc-accent);
+  box-shadow: 0 0 12px rgba(139,26,26,0.3);
+}
+
+/* Decorative trophy glyph */
+.jf-worldcup__deco {
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 160px;
+  opacity: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── RIGHT GRID ── */
+.jf-worldcup__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  align-content: start;
+}
+
+/* ── PRODUCT CARD ── */
+.jf-product-card {
+  background: var(--wc-card-bg);
+  border-radius: var(--wc-radius);
+  overflow: hidden;
+  border: 1px solid var(--wc-border);
+  cursor: pointer;
+  transition: var(--wc-transition);
+  animation: cardReveal 0.55s ease both;
+  animation-delay: var(--card-delay, 0ms);
+  position: relative;
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.jf-product-card:hover {
+  transform: translateY(-7px);
+  background: var(--wc-card-hover);
+  border-color: rgba(139,26,26,0.35);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,26,26,0.2);
+}
+
+/* Filtered-out state */
+.jf-product-card.hidden {
+  display: none;
+}
+
+/* IMAGE WRAPPER */
+.jf-product-card__img {
+  position: relative;
+  background: #111;
+  overflow: hidden;
+}
 .jf-product-card__img img {
   width: 100%;
-  height: 220px;
-  object-fit: contain; /* KEY FIX */
-  background: #111;     /* optional: fills empty space nicely */
+  height: 210px;
+  object-fit: contain;
+  display: block;
+  padding: 16px;
+  transition: transform 0.5s ease;
+}
+.jf-product-card:hover .jf-product-card__img img {
+  transform: scale(1.05);
 }
 
-/* BADGE */
+/* BADGES */
 .jf-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #681010;
+  top: 12px;
+  left: 12px;
+  padding: 4px 11px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.jf-badge--new {
+  background: var(--wc-gold);
+  color: #000;
+}
+.jf-badge--out {
+  background: rgba(0,0,0,0.7);
+  color: rgba(255,255,255,0.6);
+  left: auto;
+  right: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* QUICK VIEW BUTTON */
+.jf-quickview-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(139,26,26,0.92);
   color: #fff;
-  padding: 4px 10px;
-  font-size: .7rem;
-  border-radius: 20px;
+  border: none;
+  padding: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+.jf-quickview-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.jf-product-card:hover .jf-quickview-btn {
+  transform: translateY(0);
 }
 
-/* INFO */
+/* CARD INFO */
 .jf-product-card__info {
-  padding: 14px;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--wc-border);
+}
+.jf-product-card__country {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--wc-gold);
+  margin: 0 0 4px;
+}
+.jf-product-card__name {
+  color: var(--wc-cream);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 10px;
+  line-height: 1.2;
 }
 
-.jf-product-card__info h4 {
-  color: #EEE5D8;
-  font-size: .95rem;
-  margin-bottom: 8px;
-}
-
-/* PRICE */
+/* PRICE ROW */
 .jf-price {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
-
-.jf-price .new {
+.jf-price__tag {
   color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.jf-kit-badge {
+  font-size: 0.68rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wc-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--wc-border);
+  padding: 3px 9px;
+  border-radius: 999px;
 }
 
-.jf-price .old {
-  text-decoration: line-through;
-  color: rgba(255,255,255,.4);
+/* ── EMPTY STATE ── */
+.jf-worldcup--empty .jf-worldcup__empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  color: var(--wc-muted);
+  font-size: 1.1rem;
+  grid-template-columns: 1fr;
+  text-align: center;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
+/* ── QUICK VIEW MODAL ── */
+.jf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.jf-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.jf-modal {
+  background: #151515;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 720px;
+  position: relative;
+  overflow: hidden;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(139,26,26,0.2);
+}
+.jf-modal-overlay.active .jf-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.jf-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
+  color: #fff;
+}
+.jf-modal__close svg { width: 16px; height: 16px; }
+.jf-modal__close:hover { background: rgba(255,255,255,0.14); }
+
+/* Modal inner layout */
+.jf-modal__inner {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+/* Modal image */
+.jf-modal__img-wrap {
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 24px;
+}
+.jf-modal__img-wrap img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+}
+
+/* Modal details */
+.jf-modal__details {
+  padding: 32px 28px 32px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.jf-modal__country {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--wc-gold);
+  margin: 0 0 8px;
+}
+.jf-modal__name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--wc-cream);
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+.jf-modal__kit {
+  font-size: 0.8rem;
+  color: var(--wc-muted);
+  margin: 0 0 18px;
+  text-transform: capitalize;
+}
+.jf-modal__price-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.jf-modal__price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+.jf-modal__stock {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  color: var(--wc-muted);
+}
+.jf-modal__stock.in { color: #5ecc7b; background: rgba(94,204,123,0.1); }
+.jf-modal__stock.out { color: #cc5e5e; background: rgba(204,94,94,0.1); }
+
+.jf-modal__desc {
+  font-size: 0.85rem;
+  color: var(--wc-muted);
+  line-height: 1.7;
+  margin: 0 0 auto;
+  padding-bottom: 24px;
+  flex-grow: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+/* Modal CTA */
+.jf-modal__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: var(--wc-accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: var(--wc-transition);
+  margin-top: auto;
+  width: fit-content;
+}
+.jf-modal__cta:hover {
+  background: var(--wc-accent-lit);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.4);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .jf-worldcup__container {
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 860px) {
+  .jf-worldcup {
+    padding: 64px 24px;
+  }
   .jf-worldcup__container {
     grid-template-columns: 1fr;
+    gap: 40px;
   }
-
+  .jf-worldcup__desc {
+    max-width: 100%;
+  }
+  .jf-worldcup__deco {
+    display: none;
+  }
   .jf-worldcup__grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 560px) {
   .jf-worldcup__grid {
     grid-template-columns: 1fr;
+  }
+  .jf-modal__inner {
+    grid-template-columns: 1fr;
+  }
+  .jf-modal__img-wrap {
+    min-height: 200px;
+  }
+  .jf-modal__details {
+    padding: 22px 20px 24px;
   }
 }

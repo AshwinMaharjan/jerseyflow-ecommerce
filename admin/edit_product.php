@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('connect.php');
+require_once 'auth_guard.php';
+
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: all_products.php');

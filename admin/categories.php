@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('connect.php');
+require_once 'auth_guard.php';
 
 $success = '';
 $error   = '';

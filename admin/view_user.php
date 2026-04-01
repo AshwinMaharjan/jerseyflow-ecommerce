@@ -6,6 +6,8 @@
 
 session_start();
 require_once 'connect.php';
+require_once 'auth_guard.php';
+
 
 $user_id = (int)($_GET['id'] ?? 0);
 if (!$user_id) { header('Location: users.php'); exit; }

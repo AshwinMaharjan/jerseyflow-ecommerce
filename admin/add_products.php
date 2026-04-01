@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('connect.php');
+require_once 'auth_guard.php';
+
 
 // ── Fetch dropdown data ─────────────────────────────────────────
 $clubs_result     = mysqli_query($conn, "SELECT club_id, club_name FROM clubs ORDER BY club_name ASC");
@@ -23,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description  = trim($_POST['description'] ?? '');
     $special_type = $_POST['special_type'] ?? null;
 
-    $image_path   = '';
 
     // ── VALIDATION ───────────────────────────────────────────────
 
@@ -56,66 +57,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Select a kit.';
     }
 
-    elseif (empty($_FILES['image']['name'])) {
-        $error = 'Product image is required.';
-    }
 
     // ── IMAGE UPLOAD ─────────────────────────────────────────────
-    if (empty($error)) {
+// ── IMAGE UPLOAD ─────────────────────────────────────────────
+$uploaded_images = []; // [ ['path' => '...', 'is_primary' => 1/0], ... ]
+
+if (empty($error)) {
+
+    if (empty($_FILES['images']['name'][0])) {
+        $error = 'At least one product image is required.';
+    } else {
 
         $upload_dir   = '../uploads/products/';
         $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
         $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
         $max_size     = 2 * 1024 * 1024;
 
-        $file_tmp  = $_FILES['image']['tmp_name'];
-        $file_name = $_FILES['image']['name'];
-        $file_size = $_FILES['image']['size'];
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
 
-        if (!is_uploaded_file($file_tmp)) {
-            $error = 'Invalid file upload.';
-        } else {
-            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $file_count = count($_FILES['images']['name']);
+
+        foreach ($_FILES['images']['name'] as $index => $fname) {
+            $file_tmp  = $_FILES['images']['tmp_name'][$index];
+            $file_size = $_FILES['images']['size'][$index];
+
+            if (!is_uploaded_file($file_tmp)) {
+                $error = 'Invalid file upload on image ' . ($index + 1) . '.';
+                break;
+            }
+
+            $file_ext = strtolower(pathinfo($fname, PATHINFO_EXTENSION));
 
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime  = finfo_file($finfo, $file_tmp);
             finfo_close($finfo);
 
             if (!in_array($file_ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
-                $error = 'Invalid image format.';
-            } elseif ($file_size > $max_size) {
-                $error = 'Image must be under 2MB.';
-            } else {
-
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
-
-                $new_filename = uniqid('product_', true) . '.' . $file_ext;
-                $dest = $upload_dir . $new_filename;
-
-                if (!move_uploaded_file($file_tmp, $dest)) {
-                    $error = 'Upload failed.';
-                } else {
-                    $image_path = $new_filename;
-                }
+                $error = 'Invalid image format for file: ' . htmlspecialchars($fname);
+                break;
             }
+
+            if ($file_size > $max_size) {
+                $error = 'Image "' . htmlspecialchars($fname) . '" exceeds 2MB limit.';
+                break;
+            }
+
+            $new_filename = uniqid('product_', true) . '.' . $file_ext;
+            $dest = $upload_dir . $new_filename;
+
+            if (!move_uploaded_file($file_tmp, $dest)) {
+                $error = 'Upload failed for: ' . htmlspecialchars($fname);
+                break;
+            }
+
+            $uploaded_images[] = [
+                'path'       => $new_filename,
+                'is_primary' => ($index === 0) ? 1 : 0  // first = primary
+            ];
         }
     }
+}
 
-    // ── INSERT PRODUCT ───────────────────────────────────────────
+// ── INSERT PRODUCT ───────────────────────────────────────────
     if (empty($error)) {
 
         $club_id_val    = $club_id ?: null;
         $country_id_val = $country_id ?: null;
 
-        $stmt = mysqli_prepare($conn,
+// NEW
+$stmt = mysqli_prepare($conn,
     "INSERT INTO products
-    (product_name, price, stock, club_id, country_id, size_id, kit_id, special_type, image, description, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+    (product_name, price, stock, club_id, country_id, size_id, kit_id, special_type, description, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
 );
 
-mysqli_stmt_bind_param($stmt, 'sdiiiissss',
+mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
     $product_name,
     $price,
     $stock,
@@ -124,13 +142,21 @@ mysqli_stmt_bind_param($stmt, 'sdiiiissss',
     $size_id,
     $kit_id,
     $special_type,
-    $image_path,
     $description
 );
         if (mysqli_stmt_execute($stmt)) {
 
             // ✅ GET PRODUCT ID (FIXED)
             $new_product_id = mysqli_insert_id($conn);
+// ── INSERT INTO product_images ────────────────────────────
+$img_stmt = $conn->prepare(
+    "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, ?)"
+);
+foreach ($uploaded_images as $img) {
+    $img_stmt->bind_param('isi', $new_product_id, $img['path'], $img['is_primary']);
+    $img_stmt->execute();
+}
+$img_stmt->close();
 
             // ── GET SIZE LABEL ────────────────────────────────────
             $size_label = 'M';
@@ -431,7 +457,7 @@ if ($stock > 0 && $variant_id) {
                         <div class="form-group">
                             <label>
                                 Upload Image
-                                <span class="field-hint">(JPG, PNG, WEBP · max 2 MB)</span>
+                                <span class="field-hint">(JPG, PNG, WEBP · max 2 MB each · first image = primary)</span>
                             </label>
                             <div class="image-upload-box" id="imageUploadBox">
                                 <img id="imagePreview" src="" alt="Preview"
@@ -441,10 +467,12 @@ if ($stock > 0 && $variant_id) {
                                     <p>Click or drag &amp; drop to upload</p>
                                     <span>Recommended: 800×800 px</span>
                                 </div>
-                                <input type="file" id="image" name="image"
-                                       accept=".jpg,.jpeg,.png,.webp"
-                                       class="image-file-input"
-                                       required>
+                                <!-- NEW -->
+<input type="file" id="images" name="images[]"
+       accept=".jpg,.jpeg,.png,.webp"
+       class="image-file-input"
+       multiple
+       required>
                             </div>
                             <button type="button" class="btn-remove-image hidden" id="removeImage">
                                 <i class="fa-solid fa-xmark"></i> Remove Image

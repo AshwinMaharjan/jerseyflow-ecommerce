@@ -6,6 +6,8 @@
 
 session_start();
 require_once 'connect.php';
+require_once 'auth_guard.php';
+
 require_once 'user_logger.php';
 
 $user_id = (int)($_GET['id'] ?? 0);
