@@ -1,0 +1,201 @@
+/* ============================================================
+   JerseyFlow — Feature Spotlight Section
+   File: promotional_section.css
+   Style: Matches site-wide dark aesthetic
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
+
+/* ── SECTION WRAPPER ── */
+.jf-spotlight {
+  background: #0a0a0a;
+  padding: 60px 48px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── CONTAINER — two banners side by side ── */
+.jf-spotlight__container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* ── CARD (anchor wrapper) ── */
+.jf-spotlight__card {
+  position: relative;
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+  /* clip children to rounded corners */
+  isolation: isolate;
+}
+
+/* ── IMAGE WRAPPER ── */
+.jf-spotlight__img-wrap {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  overflow: hidden;
+}
+
+.jf-spotlight__img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.0);
+  transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Image zoom on hover */
+.jf-spotlight__card:hover .jf-spotlight__img-wrap img {
+  transform: scale(1.07);
+}
+
+/* ── DARK GRADIENT OVERLAY ── */
+.jf-spotlight__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.82) 0%,
+    rgba(0,0,0,0.30) 50%,
+    rgba(0,0,0,0.08) 100%
+  );
+  transition: background 0.4s ease;
+}
+
+/* Deepen overlay on hover */
+.jf-spotlight__card:hover .jf-spotlight__overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.90) 0%,
+    rgba(0,0,0,0.40) 55%,
+    rgba(0,0,0,0.12) 100%
+  );
+}
+
+/* ── CONTENT (sits over image) ── */
+.jf-spotlight__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 2;
+}
+
+/* TAG PILL */
+.jf-spotlight__tag {
+  display: inline-block;
+  width: fit-content;
+  background: #8b1a1a;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+/* TITLE */
+.jf-spotlight__title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #EEE5D8;
+  margin: 0;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+.jf-spotlight__title em {
+  font-style: italic;
+  color: #c9a84c;
+}
+
+/* SUBTITLE */
+.jf-spotlight__sub {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* CTA ROW */
+.jf-spotlight__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  padding-bottom: 2px;
+  width: fit-content;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.jf-spotlight__cta svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s ease;
+}
+
+/* CTA hover — arrow slides right */
+.jf-spotlight__card:hover .jf-spotlight__cta {
+  color: #c9a84c;
+  border-color: #c9a84c;
+}
+.jf-spotlight__card:hover .jf-spotlight__cta svg {
+  transform: translateX(5px);
+}
+
+/* Subtle border glow on card hover */
+.jf-spotlight__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(139,26,26,0.0);
+  transition: border-color 0.4s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+.jf-spotlight__card:hover::after {
+  border-color: rgba(139,26,26,0.5);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .jf-spotlight {
+    padding: 48px 24px;
+  }
+  .jf-spotlight__container {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .jf-spotlight__img-wrap {
+    height: 280px;
+  }
+}
+
+@media (max-width: 560px) {
+  .jf-spotlight__container {
+    grid-template-columns: 1fr;
+  }
+  .jf-spotlight__img-wrap {
+    height: 260px;
+  }
+}

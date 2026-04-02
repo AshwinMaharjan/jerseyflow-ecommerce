@@ -27,7 +27,7 @@ $sql = "SELECT
             AND pi.is_primary = 1
         WHERE p.special_type = 'retro'
         ORDER BY p.created_at DESC
-        LIMIT 4";
+        LIMIT 6";
 
 $result = $conn->query($sql);
 
@@ -64,8 +64,7 @@ if ($result && $result->num_rows > 0) {
             Retro <em>Jerseys</em>
           </h2>
           <p class="jf-retro__desc">
-            Legendary kits from football's golden eras — restored, reimagined,
-            and ready to wear. Each piece carries the soul of the beautiful game.
+            A football retro jersey refers to the re-release or the style of jerseys worn by football clubs or national teams from previous decades. These jerseys often evoke nostalgia and celebrate the team's heritage, iconic players, and historic moments in the sport.
           </p>
         </div>
       </div>

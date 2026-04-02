@@ -1,0 +1,360 @@
+/* ============================================================
+   JerseyFlow — Featured Products Section
+   File: featured_section.css
+   Layout: 4 rows × 2 columns (8 cards total)
+   Style: Matches site-wide dark aesthetic
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+  --ft-bg:          #0a0a0a;
+  --ft-card-bg:     #141414;
+  --ft-card-hover:  #1c1c1c;
+  --ft-accent:      #8b1a1a;
+  --ft-accent-lit:  #b52020;
+  --ft-gold:        #c9a84c;
+  --ft-cream:       #EEE5D8;
+  --ft-muted:       rgba(255,255,255,0.38);
+  --ft-border:      rgba(255,255,255,0.08);
+  --ft-radius:      14px;
+  --ft-transition:  0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ── SECTION WRAPPER ── */
+.jf-featured {
+  background: var(--ft-bg);
+  padding: 90px 48px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Background radial glow — same pattern as other sections */
+.jf-featured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 30%, rgba(139,26,26,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 35% at 85% 75%, rgba(201,168,76,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ── CONTAINER ── */
+.jf-featured__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ── */
+.jf-featured__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.jf-featured__header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Eyebrow — same as worldcup / retro */
+.jf-featured__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.jf-featured__eyebrow-line {
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--ft-gold);
+  border-radius: 2px;
+}
+.jf-featured__eyebrow-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ft-gold);
+}
+
+/* Main heading */
+.jf-featured__heading {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(2.2rem, 3.2vw, 3rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.0;
+  color: var(--ft-cream);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.jf-featured__heading span {
+  color: var(--ft-accent);
+}
+
+/* Header right */
+.jf-featured__header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  max-width: 360px;
+  text-align: right;
+}
+
+.jf-featured__desc {
+  color: var(--ft-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* CTA — identical to other sections */
+.jf-featured__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px;
+  background: var(--ft-accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: var(--ft-transition);
+  width: fit-content;
+}
+.jf-featured__cta svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+.jf-featured__cta:hover {
+  background: var(--ft-accent-lit);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.4);
+}
+.jf-featured__cta:hover svg {
+  transform: translateX(4px);
+}
+
+/* ── PRODUCT GRID — 2 columns, 4 rows ── */
+.jf-featured__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+/* ── PRODUCT CARD (anchor) ── */
+.jf-feat-card {
+  display: block;
+  text-decoration: none;
+  background: var(--ft-card-bg);
+  border-radius: var(--ft-radius);
+  overflow: hidden;
+  border: 1px solid var(--ft-border);
+  cursor: pointer;
+  transition: var(--ft-transition);
+  animation: ftCardReveal 0.55s ease both;
+  animation-delay: var(--card-delay, 0ms);
+  position: relative;
+}
+
+@keyframes ftCardReveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.jf-feat-card:hover {
+  transform: translateY(-6px);
+  background: var(--ft-card-hover);
+  border-color: rgba(139,26,26,0.35);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,26,26,0.2);
+}
+
+/* ── IMAGE WRAPPER ── */
+.jf-feat-card__img-wrap {
+  position: relative;
+  background: #111;
+  overflow: hidden;
+}
+.jf-feat-card__img-wrap img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  display: block;
+  padding: 16px;
+  transition: transform 0.5s ease;
+}
+.jf-feat-card:hover .jf-feat-card__img-wrap img {
+  transform: scale(1.05);
+}
+
+/* ── BADGES ── */
+.jf-feat-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 11px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  z-index: 2;
+}
+.jf-feat-badge--new {
+  background: var(--ft-gold);
+  color: #000;
+}
+.jf-feat-badge--out {
+  background: rgba(0,0,0,0.72);
+  color: rgba(255,255,255,0.6);
+  left: auto;
+  right: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ── HOVER OVERLAY with View Details ── */
+.jf-feat-card__hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(139,26,26,0.0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.35s ease;
+  z-index: 1;
+}
+.jf-feat-card:hover .jf-feat-card__hover-overlay {
+  background: rgba(139,26,26,0.18);
+}
+
+.jf-feat-card__view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(139,26,26,0.92);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.jf-feat-card__view-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.jf-feat-card:hover .jf-feat-card__view-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── CARD INFO ── */
+.jf-feat-card__info {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--ft-border);
+}
+.jf-feat-card__label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ft-gold);
+  margin: 0 0 4px;
+}
+.jf-feat-card__name {
+  color: var(--ft-cream);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+.jf-feat-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.jf-feat-card__price {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.jf-feat-card__kit {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ft-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--ft-border);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+/* ── EMPTY STATE ── */
+.jf-featured--empty .jf-featured__empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  color: var(--ft-muted);
+  font-size: 1rem;
+  font-style: italic;
+  text-align: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .jf-featured {
+    padding: 64px 24px;
+  }
+  .jf-featured__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .jf-featured__header-right {
+    align-items: flex-start;
+    text-align: left;
+    max-width: 100%;
+  }
+  .jf-featured__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .jf-featured__grid {
+    grid-template-columns: 1fr;
+  }
+  .jf-feat-card__img-wrap img {
+    height: 200px;
+  }
+}
