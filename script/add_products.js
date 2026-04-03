@@ -300,3 +300,10 @@ resetBtn.addEventListener('click', () => {
         });
     }, 0);
 });
+
+imageInput.addEventListener("change", function () {
+    if (this.files.length > 4) {
+        alert("You can upload maximum 4 images only.");
+        this.value = "";
+    }
+});

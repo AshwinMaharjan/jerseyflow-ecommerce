@@ -64,14 +64,19 @@ $uploaded_images = []; // [ ['path' => '...', 'is_primary' => 1/0], ... ]
 
 if (empty($error)) {
 
-    if (empty($_FILES['images']['name'][0])) {
-        $error = 'At least one product image is required.';
-    } else {
+    $file_count = count($_FILES['images']['name']);
+
+if ($file_count < 1) {
+    $error = 'At least one product image is required.';
+}
+elseif ($file_count > 4) {
+    $error = 'You can upload maximum 4 images only.';
+} else {
 
         $upload_dir   = '../uploads/products/';
         $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
         $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
-        $max_size     = 2 * 1024 * 1024;
+        $max_size     = 5 * 1024 * 1024;
 
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
@@ -80,6 +85,11 @@ if (empty($error)) {
         $file_count = count($_FILES['images']['name']);
 
         foreach ($_FILES['images']['name'] as $index => $fname) {
+            // ✅ ADD THIS HERE (first thing inside loop)
+    if ($_FILES['images']['error'][$index] !== UPLOAD_ERR_OK) {
+        $error = 'Upload error on file: ' . htmlspecialchars($fname);
+        break;
+    }
             $file_tmp  = $_FILES['images']['tmp_name'][$index];
             $file_size = $_FILES['images']['size'][$index];
 

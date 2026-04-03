@@ -11,6 +11,11 @@ $size_id  = intval($_GET['size_id']  ?? 0);
 $kit_id   = intval($_GET['kit_id']   ?? 0);
 $special_type = $_GET['special_type'] ?? '';
 
+// ── Pagination ─────────────────────────────────────────────────────────────
+$products_per_page = 7;
+$current_page = max(1, intval($_GET['page'] ?? 1));
+$offset = ($current_page - 1) * $products_per_page;
+
 // ── Delete action ──────────────────────────────────────────────────────────
 $delete_success = '';
 $delete_error   = '';
@@ -18,21 +23,16 @@ $delete_error   = '';
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $del_id = intval($_GET['delete']);
 
-    // Fetch image filename before deleting so we can remove the file
-    // Fetch ALL images for this product so we can delete the files
-$img_res = mysqli_query($conn, "SELECT image_path FROM product_images WHERE product_id = $del_id");
-
+    $img_res = mysqli_query($conn, "SELECT image_path FROM product_images WHERE product_id = $del_id");
 
     $del_stmt = mysqli_prepare($conn, "DELETE FROM products WHERE product_id = ?");
     mysqli_stmt_bind_param($del_stmt, 'i', $del_id);
 
     if (mysqli_stmt_execute($del_stmt)) {
-        // Remove image file if it exists
-        // NEW — delete all image files for this product
-while ($img_row = mysqli_fetch_assoc($img_res)) {
-    $img_file = '../uploads/products/' . $img_row['image_path'];
-    if (file_exists($img_file)) unlink($img_file);
-}
+        while ($img_row = mysqli_fetch_assoc($img_res)) {
+            $img_file = '../uploads/products/' . $img_row['image_path'];
+            if (file_exists($img_file)) unlink($img_file);
+        }
         $delete_success = 'Product deleted successfully.';
     } else {
         $delete_error = 'Failed to delete product.';
@@ -45,7 +45,7 @@ $clubs_result = mysqli_query($conn, "SELECT club_id, club_name FROM clubs ORDER 
 $sizes_result = mysqli_query($conn, "SELECT size_id, size_name FROM sizes ORDER BY sort_order ASC");
 $kits_result  = mysqli_query($conn, "SELECT kit_id, kit_name FROM kits ORDER BY sort_order ASC");
 
-// ── Build main query with JOINs ────────────────────────────────────────────
+// ── Build WHERE clause ─────────────────────────────────────────────────────
 $where = [];
 $params = [];
 $types  = '';
@@ -70,7 +70,6 @@ if ($kit_id > 0) {
     $params[] = $kit_id;
     $types   .= 'i';
 }
-
 if ($special_type !== '') {
     $where[]  = "p.special_type = ?";
     $params[] = $special_type;
@@ -79,6 +78,29 @@ if ($special_type !== '') {
 
 $where_sql = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+// ── Count total matching products ──────────────────────────────────────────
+$count_sql = "SELECT COUNT(*) AS total FROM products p $where_sql";
+
+if (count($params)) {
+    $count_stmt = mysqli_prepare($conn, $count_sql);
+    mysqli_stmt_bind_param($count_stmt, $types, ...$params);
+    mysqli_stmt_execute($count_stmt);
+    $count_result = mysqli_stmt_get_result($count_stmt);
+    mysqli_stmt_close($count_stmt);
+} else {
+    $count_result = mysqli_query($conn, $count_sql);
+}
+
+$total_products = (int) mysqli_fetch_assoc($count_result)['total'];
+$total_pages    = max(1, (int) ceil($total_products / $products_per_page));
+
+// Clamp current page
+if ($current_page > $total_pages) {
+    $current_page = $total_pages;
+    $offset = ($current_page - 1) * $products_per_page;
+}
+
+// ── Build main query with LIMIT / OFFSET ───────────────────────────────────
 $sql = "
     SELECT
         p.product_id,
@@ -99,23 +121,34 @@ $sql = "
         ON pi.product_id = p.product_id AND pi.is_primary = 1
     $where_sql
     ORDER BY p.created_at DESC
+    LIMIT ? OFFSET ?
 ";
 
-if (count($params)) {
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, $types, ...$params);
-    mysqli_stmt_execute($stmt);
-    $products_result = mysqli_stmt_get_result($stmt);
-} else {
-    $products_result = mysqli_query($conn, $sql);
-}
+$paginated_params   = $params;
+$paginated_params[] = $products_per_page;
+$paginated_params[] = $offset;
+$paginated_types    = $types . 'ii';
 
-$total_products = mysqli_num_rows($products_result);
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, $paginated_types, ...$paginated_params);
+mysqli_stmt_execute($stmt);
+$products_result = mysqli_stmt_get_result($stmt);
 
 // ── Build product data array for view modal (JS) ───────────────────────────
 $all_products_data = [];
 while ($row = mysqli_fetch_assoc($products_result)) {
     $all_products_data[] = $row;
+}
+
+// ── Helper: build pagination URL preserving all filters ───────────────────
+function paginate_url(int $page, string $search, int $club_id, int $size_id, int $kit_id, string $special_type): string {
+    $p = ['page' => $page];
+    if ($search !== '')       $p['search']       = $search;
+    if ($club_id > 0)         $p['club_id']       = $club_id;
+    if ($size_id > 0)         $p['size_id']       = $size_id;
+    if ($kit_id  > 0)         $p['kit_id']        = $kit_id;
+    if ($special_type !== '') $p['special_type']  = $special_type;
+    return '?' . http_build_query($p);
 }
 ?>
 <!DOCTYPE html>
@@ -144,8 +177,15 @@ while ($row = mysqli_fetch_assoc($products_result)) {
             <div class="page-header-left">
                 <h1 class="page-title"><i class="fa-solid fa-box-open"></i> All Products</h1>
                 <p class="page-subtitle">
-                    Showing <strong><?= $total_products ?></strong> product<?= $total_products !== 1 ? 's' : '' ?>
-                    <?= ($search || $club_id || $size_id || $kit_id || $special_type) ? '— filtered results' : '' ?>
+                    <?php if ($total_products === 0): ?>
+                        No products found
+                    <?php else: ?>
+                        Showing
+                        <strong><?= $offset + 1 ?>–<?= min($offset + $products_per_page, $total_products) ?></strong>
+                        of <strong><?= $total_products ?></strong>
+                        product<?= $total_products !== 1 ? 's' : '' ?>
+                        <?= ($search || $club_id || $size_id || $kit_id || $special_type) ? '— filtered results' : '' ?>
+                    <?php endif; ?>
                 </p>
             </div>
             <a href="add_products.php" class="btn-add">
@@ -232,20 +272,19 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                             <?php endwhile; ?>
                         </select>
                     </div>
+
+                    <!-- Special Type Filter -->
                     <div class="filter-group">
-    <select name="special_type" onchange="this.form.submit()">
-        <option value="">All Types</option>
-
-        <option value="retro" <?= ($special_type === 'retro') ? 'selected' : '' ?>>
-            Retro Jersey
-        </option>
-
-        <option value="worldcup_2026" <?= ($special_type === 'worldcup_2026') ? 'selected' : '' ?>>
-            World Cup 2026
-        </option>
-    </select>
-</div>
-
+                        <select name="special_type" onchange="this.form.submit()">
+                            <option value="">All Types</option>
+                            <option value="retro" <?= ($special_type === 'retro') ? 'selected' : '' ?>>
+                                Retro Jersey
+                            </option>
+                            <option value="worldcup_2026" <?= ($special_type === 'worldcup_2026') ? 'selected' : '' ?>>
+                                World Cup 2026
+                            </option>
+                        </select>
+                    </div>
 
                     <!-- Search Button -->
                     <button type="submit" class="btn-filter-search">
@@ -265,18 +304,24 @@ while ($row = mysqli_fetch_assoc($products_result)) {
 
         <!-- Table Card -->
         <div class="table-card">
+
             <?php if ($total_products === 0): ?>
+
+                <!-- ── Empty State ───────────────────────────────────────── -->
                 <div class="empty-state">
                     <i class="fa-solid fa-box-open"></i>
                     <h3>No products found</h3>
-                    <p><?= ($search || $club_id || $size_id || $kit_id) ? 'Try adjusting your filters.' : 'Start by adding your first product.' ?></p>
-                    <?php if (!$search && !$club_id && !$size_id && !$kit_id): ?>
+                    <p><?= ($search || $club_id || $size_id || $kit_id || $special_type) ? 'Try adjusting your filters.' : 'Start by adding your first product.' ?></p>
+                    <?php if (!$search && !$club_id && !$size_id && !$kit_id && !$special_type): ?>
                         <a href="add_products.php" class="btn-add">
                             <i class="fa-solid fa-plus"></i> Add Product
                         </a>
                     <?php endif; ?>
                 </div>
+
             <?php else: ?>
+
+                <!-- ── Products Table ─────────────────────────────────────── -->
                 <div class="table-responsive">
                     <table class="products-table">
                         <thead>
@@ -364,18 +409,15 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                                     <!-- Actions -->
                                     <td class="col-actions">
                                         <div class="action-btns">
-                                            <!-- View -->
                                             <button type="button"
                                                     class="action-btn btn-view" title="View"
                                                     onclick="openViewModal(<?= $product['product_id'] ?>)">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
-                                            <!-- Edit -->
                                             <a href="edit_product.php?id=<?= $product['product_id'] ?>"
                                                class="action-btn btn-edit" title="Edit">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </a>
-                                            <!-- Delete -->
                                             <button type="button"
                                                     class="action-btn btn-delete"
                                                     title="Delete"
@@ -389,7 +431,73 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                         </tbody>
                     </table>
                 </div>
+                <!-- ── /Products Table ────────────────────────────────────── -->
+
+                <!-- ── Pagination ─────────────────────────────────────────── -->
+                <?php if ($total_pages > 1): ?>
+                <div class="pagination-wrap">
+
+                    <!-- Prev button -->
+                    <?php if ($current_page > 1): ?>
+                        <a class="page-btn page-nav"
+                           href="<?= paginate_url($current_page - 1, $search, $club_id, $size_id, $kit_id, $special_type) ?>">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    <?php else: ?>
+                        <span class="page-btn page-nav disabled">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </span>
+                    <?php endif; ?>
+
+                    <!-- Page numbers with smart ellipsis -->
+                    <?php
+                    $window      = 2;
+                    $pages_shown = [];
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        if (
+                            $i === 1 ||
+                            $i === $total_pages ||
+                            ($i >= $current_page - $window && $i <= $current_page + $window)
+                        ) {
+                            $pages_shown[] = $i;
+                        }
+                    }
+                    $prev_shown = null;
+                    foreach ($pages_shown as $p):
+                        if ($prev_shown !== null && $p - $prev_shown > 1): ?>
+                            <span class="page-btn page-ellipsis">…</span>
+                        <?php endif;
+                        if ($p === $current_page): ?>
+                            <span class="page-btn page-active"><?= $p ?></span>
+                        <?php else: ?>
+                            <a class="page-btn"
+                               href="<?= paginate_url($p, $search, $club_id, $size_id, $kit_id, $special_type) ?>">
+                                <?= $p ?>
+                            </a>
+                        <?php endif;
+                        $prev_shown = $p;
+                    endforeach;
+                    ?>
+
+                    <!-- Next button -->
+                    <?php if ($current_page < $total_pages): ?>
+                        <a class="page-btn page-nav"
+                           href="<?= paginate_url($current_page + 1, $search, $club_id, $size_id, $kit_id, $special_type) ?>">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    <?php else: ?>
+                        <span class="page-btn page-nav disabled">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                    <?php endif; ?>
+
+                </div>
+                <?php endif; ?>
+                <!-- ── /Pagination ────────────────────────────────────────── -->
+
             <?php endif; ?>
+            <!-- ── END if/else total_products ────────────────────────────── -->
+
         </div><!-- /table-card -->
 
     </div><!-- /main-content -->
@@ -401,7 +509,6 @@ while ($row = mysqli_fetch_assoc($products_result)) {
 <div class="modal-overlay" id="viewModal">
     <div class="modal-box view-modal-box">
 
-        <!-- Modal Header -->
         <div class="view-modal-header">
             <h3 class="view-modal-title"><i class="fa-solid fa-box-open"></i> Product Details</h3>
             <button class="view-modal-close" onclick="closeViewModal()">
@@ -409,10 +516,8 @@ while ($row = mysqli_fetch_assoc($products_result)) {
             </button>
         </div>
 
-        <!-- Modal Body -->
         <div class="view-modal-body">
 
-            <!-- Left: Image -->
             <div class="view-modal-image-col">
                 <div class="view-modal-image-wrap">
                     <img id="vm-image" src="" alt="Product Image" onerror="this.src='../images/no_image.png'">
@@ -423,14 +528,10 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                 </div>
             </div>
 
-            <!-- Right: Details -->
             <div class="view-modal-details-col">
-
                 <h2 class="vm-product-name" id="vm-name">—</h2>
                 <div class="vm-price" id="vm-price">—</div>
-
                 <div class="vm-badges" id="vm-badges"></div>
-
                 <div class="vm-meta-grid">
                     <div class="vm-meta-item">
                         <span class="vm-meta-label"><i class="fa-solid fa-warehouse"></i> Stock</span>
@@ -449,16 +550,14 @@ while ($row = mysqli_fetch_assoc($products_result)) {
                         <span class="vm-meta-value" id="vm-size">—</span>
                     </div>
                 </div>
-
                 <div class="vm-description-wrap" id="vm-description-wrap">
                     <span class="vm-meta-label"><i class="fa-solid fa-align-left"></i> Description</span>
                     <p class="vm-description" id="vm-description">—</p>
                 </div>
-
             </div>
+
         </div>
 
-        <!-- Modal Footer Actions -->
         <div class="view-modal-footer">
             <button class="modal-btn modal-cancel" onclick="closeViewModal()">
                 <i class="fa-solid fa-arrow-left"></i> Back to Products
@@ -486,19 +585,20 @@ while ($row = mysqli_fetch_assoc($products_result)) {
         </div>
     </div>
 </div>
+
 <script>
     window.PAGE_DATA = {
-        search: <?= json_encode($search) ?>,
-        club_id: <?= json_encode($club_id) ?>,
-        size_id: <?= json_encode($size_id) ?>,
-        kit_id: <?= json_encode($kit_id) ?>
+        search:       <?= json_encode($search) ?>,
+        club_id:      <?= json_encode($club_id) ?>,
+        size_id:      <?= json_encode($size_id) ?>,
+        kit_id:       <?= json_encode($kit_id) ?>,
+        current_page: <?= json_encode($current_page) ?>
     };
 
     window.PRODUCTS = <?= json_encode($all_products_data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
 
-<script src="assets/js/products.js"></script>
-<script src="../script/all_products.js"></script>
+<script src="/jerseyflow/script/all_products.js"></script>
 
 </body>
 </html>

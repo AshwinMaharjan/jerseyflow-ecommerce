@@ -1,4 +1,3 @@
-
 const PRODUCTS = window.PRODUCTS;
 const PAGE_DATA = window.PAGE_DATA;
 
@@ -8,8 +7,8 @@ function openViewModal(id) {
     if (!p) return;
 
     // Image
-    const img    = document.getElementById('vm-image');
-    const noImg  = document.getElementById('vm-no-image');
+    const img   = document.getElementById('vm-image');
+    const noImg = document.getElementById('vm-no-image');
     if (p.image) {
         img.src = '../uploads/products/' + p.image;
         img.classList.remove('hidden');
@@ -22,14 +21,17 @@ function openViewModal(id) {
 
     // Text fields
     document.getElementById('vm-name').textContent  = p.product_name || '—';
-    document.getElementById('vm-price').textContent = p.price ? 'Rs. ' + parseFloat(p.price).toLocaleString('en-IN', {minimumFractionDigits: 2}) : '—';
+    document.getElementById('vm-price').textContent = p.price
+        ? 'Rs. ' + parseFloat(p.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+        : '—';
 
     // Stock badge
     const stock      = parseInt(p.stock) || 0;
     const stockClass = stock === 0 ? 'stock-out' : (stock <= 5 ? 'stock-low' : 'stock-ok');
     const stockLabel = stock === 0 ? 'Out of Stock' : (stock <= 5 ? 'Low Stock' : 'In Stock');
     document.getElementById('vm-stock').innerHTML =
-        `<span class="stock-badge ${stockClass}">${stockLabel}</span> <span style="font-size:12px;color:var(--muted)">${stock} pcs</span>`;
+        `<span class="stock-badge ${stockClass}">${stockLabel}</span> ` +
+        `<span style="font-size:12px;color:var(--muted)">${stock} pcs</span>`;
 
     document.getElementById('vm-club').textContent = p.club_name || '—';
     document.getElementById('vm-kit').textContent  = p.kit_name  || '—';
@@ -46,8 +48,8 @@ function openViewModal(id) {
     const descWrap = document.getElementById('vm-description-wrap');
     const descEl   = document.getElementById('vm-description');
     if (p.description && p.description.trim()) {
-        descEl.textContent = p.description;
-        descWrap.style.display = 'block';
+        descEl.textContent    = p.description;
+        descWrap.style.display = 'flex';
     } else {
         descWrap.style.display = 'none';
     }
@@ -75,12 +77,13 @@ document.getElementById('viewModal').addEventListener('click', function (e) {
 // ── Delete Modal ──────────────────────────────────────────────────────────
 function confirmDelete(id, name) {
     document.getElementById('deleteProductName').textContent = name;
-document.getElementById('deleteConfirmBtn').href =
-    'all_products.php?delete=' + id +
-    (PAGE_DATA.search ? '&search=' + encodeURIComponent(PAGE_DATA.search) : '') +
-    (PAGE_DATA.club_id ? '&club_id=' + PAGE_DATA.club_id : '') +
-    (PAGE_DATA.size_id ? '&size_id=' + PAGE_DATA.size_id : '') +
-    (PAGE_DATA.kit_id ? '&kit_id=' + PAGE_DATA.kit_id : '');
+
+    // Build delete URL preserving ALL current GET params except 'delete' itself
+    const params = new URLSearchParams(window.location.search);
+    params.delete('delete'); // remove stale delete param if any
+    params.set('delete', id);
+
+    document.getElementById('deleteConfirmBtn').href = 'all_products.php?' + params.toString();
     document.getElementById('deleteModal').classList.add('active');
 }
 
@@ -102,7 +105,7 @@ function clearSearch() {
 document.querySelectorAll('.alert').forEach(el => {
     setTimeout(() => {
         el.style.transition = 'opacity 0.5s';
-        el.style.opacity = '0';
+        el.style.opacity    = '0';
         setTimeout(() => el.remove(), 500);
     }, 3500);
 });
