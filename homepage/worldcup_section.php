@@ -28,7 +28,7 @@ $sql = "SELECT
             AND pi.is_primary = 1
         WHERE p.special_type = 'worldcup_2026'
         ORDER BY p.created_at DESC
-        LIMIT 4";
+        LIMIT 8";
 
 $result = $conn->query($sql);
 

@@ -51,13 +51,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <i class="fa-solid fa-clock-rotate-left drop-icon"></i>
           Football Retro Jersey
         </a>
-        <a href="jersey.php?type=country">
-          <i class="fa-solid fa-earth-americas drop-icon"></i>
-          Football Country Jersey
+        <a href="jersey.php?type=limited_edition">
+          <i class="fa-solid fa-crown drop-icon"></i>
+          Limited Edition Jersey
         </a>
-        <a href="jersey.php?type=keeper">
-          <i class="fa-solid fa-hands drop-icon"></i>
-          Keeper Jersey
+        <a href="jersey.php?type=player_edition">
+          <i class="fa-solid fa-user drop-icon"></i>
+          Player Edition Jersey
         </a>
       </div>
     </li>

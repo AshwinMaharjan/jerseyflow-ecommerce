@@ -434,6 +434,18 @@ if ($stock > 0 && $variant_id) {
     <select id="special_type" name="special_type">
         <option value="">-- None --</option>
 
+        <option value="standard"
+            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'standard') ? 'selected' : '' ?>>
+            Standard Jersey
+        </option>
+        <option value="player_edition"
+            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'player_edition') ? 'selected' : '' ?>>
+            Player Edition Jersey
+        </option>
+        <option value="limited"
+            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'limited') ? 'selected' : '' ?>>
+            Limited Jersey
+        </option>
         <option value="retro"
             <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'retro') ? 'selected' : '' ?>>
             Retro Jersey

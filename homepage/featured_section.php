@@ -11,24 +11,27 @@
 // --- DB QUERY ---
 $featured_products = [];
 
-$sql = "SELECT
+$sql = "SELECT 
             p.product_id,
             p.product_name,
             p.price,
-            p.image,
-            p.stock,
             p.description,
+            p.stock,
             c.country_name,
             k.kit_name,
-            cl.club_name
+            cl.club_name,
+            pi.image_path
         FROM products p
-        LEFT JOIN countries c  ON p.country_id = c.country_id
-        LEFT JOIN kits k       ON p.kit_id     = k.kit_id
-        LEFT JOIN clubs cl     ON p.club_id    = cl.club_id
-        WHERE p.special_type NOT IN ('worldcup_2026', 'retro')
+        LEFT JOIN countries c ON p.country_id = c.country_id
+        LEFT JOIN kits k ON p.kit_id = k.kit_id
+        LEFT JOIN clubs cl ON p.club_id = cl.club_id
+        LEFT JOIN product_images pi 
+            ON p.product_id = pi.product_id 
+            AND pi.is_primary = 1
+        WHERE p.special_type = 'standard'
            OR p.special_type IS NULL
         ORDER BY p.created_at DESC
-        LIMIT 8";
+        LIMIT 6";
 
 $result = $conn->query($sql);
 
@@ -84,9 +87,9 @@ if ($result && $result->num_rows > 0) {
                   ? $p['club_name']
                   : ($p['country_name'] ?? '');
 
-        $img_src = !empty($p['image'])
-                    ? '/jerseyflow-ecommerce/' . htmlspecialchars($p['image'])
-                    : '/jerseyflow-ecommerce/images/placeholder.png';
+        $img_src = !empty($p['image_path'])
+    ? '/jerseyflow-ecommerce/uploads/products/' . htmlspecialchars($p['image_path'])
+    : '/jerseyflow-ecommerce/images/products/placeholder.png';
 
         $is_new = ($index < 2); // Mark top 2 newest as "New"
       ?>
@@ -102,7 +105,7 @@ if ($result && $result->num_rows > 0) {
               src="<?= $img_src ?>"
               alt="<?= htmlspecialchars($p['product_name']) ?>"
               loading="lazy"
-              onerror="this.src='/jerseyflow-ecommerce/images/placeholder.png'"
+              onerror="this.src='/jerseyflow-ecommerce/images/products/placeholder.png'"
             >
 
             <?php if ($is_new): ?>

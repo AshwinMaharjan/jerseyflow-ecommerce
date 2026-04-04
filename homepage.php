@@ -18,6 +18,7 @@
     <?php include("homepage/clubs_section.php"); ?>
     <?php include("homepage/worldcup_section.php"); ?>
     <?php include("homepage/retro_section.php"); ?>
+    <?php include("homepage/limited_edition.php"); ?>
     <?php include("homepage/promotional_section.php"); ?>
     <?php include("footer.php"); ?>
 

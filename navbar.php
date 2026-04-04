@@ -55,9 +55,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <i class="fa-solid fa-earth-americas drop-icon"></i>
           Football Country Jersey
         </a>
-        <a href="jersey.php?type=keeper">
-          <i class="fa-solid fa-hands drop-icon"></i>
-          Keeper Jersey
+        <a href="jersey.php?type=limited">
+          <i class="fa-solid fa-crown drop-icon"></i>
+          Limited Edition Jersey
         </a>
       </div>
     </li>

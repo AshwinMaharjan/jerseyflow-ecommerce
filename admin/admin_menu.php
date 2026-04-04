@@ -140,20 +140,6 @@ function isOpen(array $pages, string $current): string {
       </div>
     </div>
 
-    <!-- ── 8. Review / Feedback ──────────────────────────────────────────── -->
-    <div class="sidebar-item<?= isOpen(['reviews', 'feedback', 'flagged_reviews'], $current_page) ?>">
-      <button class="sidebar-link<?= isActive('reviews', $current_page) ?>"
-              onclick="toggleMenu(this)">
-        <span class="sidebar-link-icon"><i class="fa-solid fa-star-half-stroke"></i></span>
-        <span class="sidebar-link-label">Review / Feedback</span>
-        <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
-      </button>
-      <div class="sidebar-dropdown">
-        <a href="reviews.php"         class="sidebar-dropdown-link<?= isActive('reviews', $current_page) ?>">All Reviews</a>
-        <a href="feedback.php"        class="sidebar-dropdown-link<?= isActive('feedback', $current_page) ?>">Customer Feedback</a>
-        <a href="flagged_reviews.php" class="sidebar-dropdown-link<?= isActive('flagged_reviews', $current_page) ?>">Flagged / Pending</a>
-      </div>
-    </div>
   <div class="sidebar-footer">
 
   <!-- ── Footer: Logout ───────────────────────────────────────────────────── -->

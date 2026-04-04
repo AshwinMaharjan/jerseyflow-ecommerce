@@ -2,4 +2,7 @@ set @num:=0;
 update products set product_id=@num:=(@num+1);
 alter table products auto_increment=1;
 
+set @num:=0;
+update product_variants set variant_id=@num:=(@num+1);
+alter table product_variants auto_increment=1;
 

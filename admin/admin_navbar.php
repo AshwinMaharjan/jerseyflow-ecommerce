@@ -25,7 +25,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
   <!-- ── LEFT: BRAND ───────────────────────────── -->
   <div class="admin-logo">
-    <a href="admin_homepage.php">
+    <a href="/jerseyflow-ecommerce/admin/admin_homepage.php">
       <img src="/jerseyflow-ecommerce/images/logo.png" alt="JerseyFlow Admin" />
     </a>
   </div>
@@ -51,9 +51,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
       <div class="dropdown-menu">
         <h4>Notifications</h4>
-        <a href="orders.php">🛒 New order received</a>
-        <a href="stock.php">⚠ Low stock alert</a>
-        <a href="users.php">👤 New user registered</a>
+        <a href="/jerseyflow-ecommerce/admin/orders_management/all_orders.php">🛒 New order received</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_low_stock.php">⚠ Low stock alert</a>
+        <a href="/jerseyflow-ecommerce/admin/users.php">👤 New user registered</a>
       </div>
     </div>
 
@@ -63,9 +63,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
       <div class="dropdown-menu">
         <h4>Quick Actions</h4>
-        <a href="add_jersey.php">➕ Add Jersey</a>
-        <a href="orders.php">📦 View Orders</a>
-        <a href="users.php">👥 Manage Users</a>
+        <a href="/jerseyflow-ecommerce/admin/add_products.php">➕ Add Jersey</a>
+        <a href="/jerseyflow-ecommerce/admin/orders_management/all_orders.php">📦 View Orders</a>
+        <a href="/jerseyflow-ecommerce/admin/users.php">👥 Manage Users</a>
       </div>
     </div>
 
