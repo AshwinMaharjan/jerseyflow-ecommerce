@@ -1,0 +1,11 @@
+Create a single wide composition divided into three sections showing the same football jersey based on the reference image.
+
+LEFT section: back view of the jersey, maintaining identical design, colors, collar, sleeves, and fabric details, clean studio background.
+
+CENTER section: close-up macro shot of the jersey fabric, showing mesh texture, stitching, and material details, accurate colors matching the reference.
+
+RIGHT section: an athletic male model wearing the same jersey, natural pose, realistic fit, stadium background with blurred crowd, cinematic lighting.
+
+Ensure all three sections are clearly separated with 3 halves, no margins required and consistent lighting and color across the entire image, ultra realistic, 4K, e-commerce product photography style, no text, no watermark.
+Aspect Ratio: Wide
+e.g. 1024 x 512 or 1536 x 768

@@ -79,7 +79,7 @@ if ($result && $result->num_rows > 0) {
           <button class="jf-retro-filter" data-filter="away">Away</button>
         </div>
 
-        <a href="retro.php" class="jf-retro__cta">
+        <a href="/jerseyflow-ecommerce/jersey.php?type=retro" class="jf-retro__cta">
           Browse All Retro Kits
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>

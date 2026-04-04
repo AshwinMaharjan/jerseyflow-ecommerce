@@ -97,7 +97,7 @@ if ($result && $result->num_rows > 0) {
           <button class="jf-ltd-filter" data-filter="away">Away</button>
         </div>
 
-        <a href="limited.php" class="jf-ltd__cta">
+        <a href="/jerseyflow-ecommerce/jersey.php?type=limited" class="jf-ltd__cta">
           Shop All Limited Drops
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>

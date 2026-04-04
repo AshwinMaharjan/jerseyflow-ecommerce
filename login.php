@@ -1,16 +1,18 @@
 <?php
 session_start();
+include ("connect.php");
 
 // If already logged in, redirect straight to their area
-if (isset($_SESSION['user_id'], $_SESSION['role'])) {
+
+if (!empty($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
         header('Location: admin/admin_homepage.php');
+        exit;
     } else {
         header('Location: users/users_homepage.php');
+        exit;
     }
-    exit;
 }
-
 $reason = $_GET['reason'] ?? '';
 ?>
 <!DOCTYPE html>

@@ -64,7 +64,7 @@ if ($result && $result->num_rows > 0) {
         fabric built for match day and beyond. Represent your nation in style.
       </p>
 
-      <a href="worldcup.php" class="jf-worldcup__cta">
+      <a href="/jerseyflow-ecommerce/jersey.php?type=worldcup_2026" class="jf-worldcup__cta">
         <span>View All Kits</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M12 5l7 7-7 7"/>

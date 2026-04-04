@@ -17,22 +17,22 @@ $clubs = [
     [
         'img'  => 'images/clubs/manu.png',
         'name' => 'Man United',
-        'page' => 'clubs.php?club=manchester-united',
+        'page' => 'clubs.php?club=manchesterunited',
     ],
     [
         'img'  => 'images/clubs/real_madrid.png',
         'name' => 'Real Madrid',
-        'page' => 'clubs.php?club=real-madrid',
+        'page' => 'clubs.php?club=realmadrid',
     ],
     [
         'img'  => 'images/clubs/barcelona.png',
         'name' => 'FC Barcelona',
-        'page' => 'clubs.php?club=barcelona',
+        'page' => 'clubs.php?club=fcbarcelona',
     ],
     [
         'img'  => 'images/clubs/arsenal.png',
         'name' => 'Arsenal',
-        'page' => 'clubs.php?club=arsenal',
+        'page' => 'clubs.php?club=arsenalfc',
     ],
     [
         'img'  => 'images/clubs/juventus.png',
@@ -42,7 +42,7 @@ $clubs = [
     [
         'img'  => 'images/clubs/liverpool.png',
         'name' => 'Liverpool FC',
-        'page' => 'clubs.php?club=liverpool',
+        'page' => 'clubs.php?club=liverpoolfc',
     ],
 ];
 ?>

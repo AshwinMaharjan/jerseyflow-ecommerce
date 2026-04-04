@@ -12,7 +12,7 @@
   <div class="jf-spotlight__container">
 
     <!-- BANNER 1 -->
-    <a href="#" class="jf-spotlight__card">
+    <a href="/jerseyflow-ecommerce/jersey.php?type=retro" class="jf-spotlight__card">
       <div class="jf-spotlight__img-wrap">
         <img
           src="/jerseyflow-ecommerce/images/banner/banner5.jpeg"
@@ -36,7 +36,7 @@
     </a>
 
     <!-- BANNER 2 -->
-    <a href="#" class="jf-spotlight__card">
+    <a href="/jerseyflow-ecommerce/jersey.php?type=standard" class="jf-spotlight__card">
       <div class="jf-spotlight__img-wrap">
         <img
           src="/jerseyflow-ecommerce/images/banner/banner6.jpeg"

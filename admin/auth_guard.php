@@ -31,8 +31,6 @@ if (
     $guard_row['status']     !== 'active'||   // account deactivated
     $guard_row['is_deleted']  == 1            // soft deleted
 ) {
-    session_unset();
-    session_destroy();
     header('Location: /jerseyflow-ecommerce/login.php?reason=unauthorized');
-    exit;
+exit;
 }

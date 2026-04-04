@@ -104,7 +104,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <div class="logout-actions">
       <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
-      <a href="../homepage.php" class="logout-btn">Logout</a>
+      <a href="/jerseyflow-ecommerce/logout.php" class="logout-btn">Logout</a>
     </div>
 
   </div>

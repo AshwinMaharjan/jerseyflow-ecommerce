@@ -39,13 +39,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <i class="fa-solid fa-chevron-down chev"></i>
       </a>
       <div class="jf-dropdown">
-        <a href="jersey.php?type=fifa-2026">
-          <i class="fa-solid fa-trophy drop-icon"></i>
-          FIFA World Cup 2026 Jersey
-        </a>
-        <a href="jersey.php?type=club">
+        <a href="jersey.php?type=standard">
           <i class="fa-solid fa-shield-halved drop-icon"></i>
           Football Club Jersey
+        </a>
+        <a href="jersey.php?type=worldcup_2026">
+          <i class="fa-solid fa-trophy drop-icon"></i>
+          FIFA World Cup 2026 Jersey
         </a>
         <a href="jersey.php?type=retro">
           <i class="fa-solid fa-clock-rotate-left drop-icon"></i>
@@ -179,8 +179,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </button>
         <div class="jf-mobile-sub" id="mobJersey">
           <ul>
-            <li><a href="jersey.php?type=fifa-2026"><i class="fa-solid fa-trophy drop-icon"></i> FIFA World Cup 2026 Jersey</a></li>
-            <li><a href="jersey.php?type=club"><i class="fa-solid fa-shield-halved drop-icon"></i> Football Club Jersey</a></li>
+            <li><a href="jersey.php?type=standard"><i class="fa-solid fa-shield-halved drop-icon"></i> Football Club Jersey</a></li>
+            <li><a href="jersey.php?type=worldcup-2026"><i class="fa-solid fa-trophy drop-icon"></i> FIFA World Cup 2026 Jersey</a></li>
             <li><a href="jersey.php?type=retro"><i class="fa-solid fa-clock-rotate-left drop-icon"></i> Football Retro Jersey</a></li>
             <li><a href="jersey.php?type=country"><i class="fa-solid fa-earth-americas drop-icon"></i> Football Country Jersey</a></li>
             <li><a href="jersey.php?type=keeper"><i class="fa-solid fa-hands drop-icon"></i> Keeper Jersey</a></li>
