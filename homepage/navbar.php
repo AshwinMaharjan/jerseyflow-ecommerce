@@ -195,8 +195,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </button>
         <div class="jf-mobile-sub" id="mobClub">
           <ul>
-            <li><a href="clubs.php?club=real-madrid"><i class="fa-solid fa-star drop-icon"></i> Real Madrid</a></li>
-            <li><a href="clubs.php?club=barcelona"><i class="fa-solid fa-star drop-icon"></i> FC Barcelona</a></li>
+            <li><a href="clubs.php?club=realmadrid"><i class="fa-solid fa-star drop-icon"></i> Real Madrid</a></li>
+            <li><a href="clubs.php?club=fcbarcelona"><i class="fa-solid fa-star drop-icon"></i> FC Barcelona</a></li>
             <li><a href="clubs.php?club=manchester-united"><i class="fa-solid fa-star drop-icon"></i> Manchester United</a></li>
             <li><a href="clubs.php?club=arsenal"><i class="fa-solid fa-star drop-icon"></i> Arsenal</a></li>
             <li><a href="clubs.php?club=liverpool"><i class="fa-solid fa-star drop-icon"></i> Liverpool FC</a></li>

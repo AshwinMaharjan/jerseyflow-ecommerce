@@ -2,7 +2,7 @@
 require_once 'connect.php'; // provides $conn (mysqli)
 
 // ── Resolve club from URL ─────────────────────────────────────
-// URL pattern: clubs.php?club=barcelona
+// URL pattern: clubs.php?club=fcbarcelona
 $club_slug = isset($_GET['club']) ? trim($_GET['club']) : '';
 
 // Match club by name (case-insensitive, space-insensitive)
@@ -227,7 +227,7 @@ function club_initials(string $name): string {
                             ? $type_labels[$jersey['special_type']]
                             : null;
                     ?>
-                    <a href="jersey_detail.php?id=<?= (int)$jersey['product_id'] ?>" class="jersey-card">
+                    <a href="product.php?id=<?= (int)$jersey['product_id'] ?>" class="jersey-card">
 
                         <div class="card-img">
                             <?php if (!empty($display_img)): ?>

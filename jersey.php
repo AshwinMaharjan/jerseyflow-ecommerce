@@ -186,7 +186,7 @@ $q       = $q_parts ? '&' . http_build_query($q_parts) : '';
                         ? $type_labels[$jersey['special_type']]
                         : null;
                 ?>
-                <a href="jersey_detail.php?id=<?= (int)$jersey['product_id'] ?>" class="jersey-card">
+                <a href="product.php?id=<?= (int)$jersey['product_id'] ?>" class="jersey-card">
 
                     <!-- Image -->
                     <div class="card-img">
