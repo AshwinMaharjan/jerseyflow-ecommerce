@@ -65,15 +65,16 @@ $type_labels = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>My Cart – JerseyFlow</title>
     <link rel="icon" href="/jerseyflow-ecommerce/images/logo_icon.ico?v=2">
-    <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="assets/fonts/barlow-condensed/barlow-condensed.css">
-    <link rel="stylesheet" href="style/footer.css">
-    <link rel="stylesheet" href="style/cart.css">
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../assets/fonts/barlow-condensed/barlow-condensed.css">
+    <link rel="stylesheet" href="../style/footer.css">
+    <link rel="stylesheet" href="../style/cart.css">
+    <link rel="stylesheet" href="../style/navbar.css">
 </head>
 <body>
-<?php include("navbar.php"); ?>
-
-<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+    
+    <?php include("../homepage/navbar.php"); ?>
+    <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 
 <main class="cart-page">
 
@@ -214,7 +215,7 @@ $type_labels = [
                 <i class="fa-solid fa-lock"></i> Proceed to Checkout
             </a>
 
-            <a href="jersey.php" class="btn-continue">
+            <a href="/jerseyflow-ecommerce/jersey.php" class="btn-continue">
                 <i class="fa-solid fa-arrow-left"></i> Continue Shopping
             </a>
         </aside>
@@ -225,8 +226,8 @@ $type_labels = [
 
 </main>
 
-<?php include("footer.php"); ?>
+<?php include("../footer.php"); ?>
 
-<script src="script/cart.js"></script>
+<script src="../script/cart.js"></script>
 </body>
 </html>

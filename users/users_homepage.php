@@ -1,22 +1,31 @@
-<?php if(isset($_SESSION['popup'])): ?>
-<script>
-  window.onload = function() {
-    showPopup(
-      "<?= $_SESSION['popup']['type']; ?>",
-      "<?= $_SESSION['popup']['message']; ?>"
-    );
-  }
-</script>
-<?php unset($_SESSION['popup']); endif; ?>
-
+<?php 
+session_start(); 
+require_once('connect.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Users Homepage | JerseyFlow</title>
+    <link rel="icon" href="../images/logo_icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../style/footer.css">
+    <link rel="stylesheet" href="../style/users_menu.css">
 </head>
 <body>
-    <h1>hello</h1>
+
+    <?php include 'users_navbar.php'; ?>
+
+    <div class="page-wrapper">
+        <?php include 'users_menu.php'; ?>
+
+        <div class="main-content">
+            <h1>Dashboard</h1>
+        </div>
+    </div>
+
+    <?php include 'footer.php'; ?>
+
 </body>
 </html>
