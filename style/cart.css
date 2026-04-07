@@ -182,6 +182,9 @@ body {
     display:        flex;
     flex-direction: column;
     gap:            14px;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 /* ── Single cart item ───────────────────────────────────────── */
@@ -545,4 +548,274 @@ body {
     .item-img-wrap { width: 72px; height: 72px; }
     .item-bottom  { flex-direction: column; align-items: flex-start; }
     .item-line-total { text-align: left; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ITEM SELECTION — Checkboxes
+════════════════════════════════════════════════════════════ */
+
+/* Hide native checkbox, keep it accessible */
+.item-checkbox-wrap {
+    display:      flex;
+    align-items:  center;
+    flex-shrink:  0;
+    cursor:       pointer;
+    padding-top:  2px; /* optical alignment with image */
+}
+
+.item-checkbox-wrap input[type="checkbox"] {
+    position: absolute;
+    opacity:  0;
+    width:    0;
+    height:   0;
+}
+
+/* Custom checkbox box */
+.custom-checkbox {
+    width:         18px;
+    height:        18px;
+    border:        2px solid rgba(255,255,255,.2);
+    border-radius: 4px;
+    background:    transparent;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    flex-shrink:   0;
+    transition:    border-color .18s, background .18s;
+    position:      relative;
+}
+
+/* Checked state — filled red */
+.item-checkbox-wrap input[type="checkbox"]:checked + .custom-checkbox,
+.select-all-label   input[type="checkbox"]:checked + .custom-checkbox {
+    background:   var(--red);
+    border-color: var(--red);
+}
+
+/* Checkmark via pseudo-element */
+.item-checkbox-wrap input[type="checkbox"]:checked + .custom-checkbox::after,
+.select-all-label   input[type="checkbox"]:checked + .custom-checkbox::after {
+    content:      '';
+    display:      block;
+    width:        5px;
+    height:       9px;
+    border:       2px solid #fff;
+    border-top:   none;
+    border-left:  none;
+    transform:    rotate(45deg) translateY(-1px);
+}
+
+/* Indeterminate state (dash) */
+.select-all-label input[type="checkbox"]:indeterminate + .custom-checkbox {
+    background:   var(--red-soft);
+    border-color: var(--red);
+}
+.select-all-label input[type="checkbox"]:indeterminate + .custom-checkbox::after {
+    content:      '';
+    display:      block;
+    width:        8px;
+    height:       2px;
+    background:   #fff;
+    border:       none;
+    transform:    none;
+    border-radius: 1px;
+}
+
+/* Hover effect */
+.item-checkbox-wrap:hover .custom-checkbox,
+.select-all-label:hover   .custom-checkbox {
+    border-color: rgba(255,255,255,.45);
+}
+
+/* Focus ring for accessibility */
+.item-checkbox-wrap input[type="checkbox"]:focus-visible + .custom-checkbox,
+.select-all-label   input[type="checkbox"]:focus-visible + .custom-checkbox {
+    outline:        2px solid var(--red);
+    outline-offset: 2px;
+}
+
+/* Deselected item — dimmed */
+.cart-item.item-deselected {
+    opacity: .45;
+    transition: opacity .2s ease;
+}
+.cart-item.item-deselected:hover {
+    opacity: .65;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SELECT ALL BAR
+════════════════════════════════════════════════════════════ */
+.select-all-bar {
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         10px 16px;
+    margin-bottom:   10px;
+    background:      var(--panel);
+    border:          1px solid var(--border);
+    border-radius:   var(--radius);
+}
+
+.select-all-label {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+    cursor:      pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:   .88rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color:       var(--text);
+    user-select: none;
+}
+
+.selected-count-label {
+    font-family:    'Barlow Condensed', sans-serif;
+    font-size:      .78rem;
+    font-weight:    500;
+    letter-spacing: .04em;
+    color:          var(--muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CHECKOUT BUTTON — disabled state
+════════════════════════════════════════════════════════════ */
+.btn-checkout--disabled,
+.btn-checkout:disabled {
+    background:  rgba(104,16,16,.35) !important;
+    color:       rgba(255,255,255,.35) !important;
+    cursor:      not-allowed !important;
+    transform:   none !important;
+}
+
+/* No-selection warning */
+.no-selection-msg {
+    display:     flex;
+    align-items: center;
+    gap:         7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:   .8rem;
+    font-weight: 500;
+    color:       #f87171;
+    margin-top:  -8px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CART ITEM — include checkbox in flex layout
+════════════════════════════════════════════════════════════ */
+/* cart-item already has display:flex; gap:16px — checkbox slot
+   is the first child so it lines up naturally */
+
+/* checkout form inside sidebar — no default margin */
+#checkoutForm { margin: 0; }
+
+
+/* ── Confirmation Modal ─────────────────────────────────────────────────── */
+
+.jf-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn .18s ease;
+}
+
+.jf-modal-overlay.active {
+    display: flex;
+}
+
+.jf-modal {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem 2rem 1.6rem;
+    max-width: 380px;
+    width: calc(100% - 2rem);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+    animation: modalSlideUp .2s ease;
+}
+
+.jf-modal-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff0f0;
+    color: #e03131;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.jf-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 .45rem;
+}
+
+.jf-modal-body {
+    font-size: .92rem;
+    color: #555;
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+}
+
+.jf-modal-actions {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+}
+
+.jf-modal-cancel,
+.jf-modal-confirm {
+    flex: 1;
+    padding: .65rem 1rem;
+    border-radius: 8px;
+    font-size: .92rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background .15s, transform .1s;
+}
+
+.jf-modal-cancel {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.jf-modal-cancel:hover {
+    background: #e2e5e8;
+}
+
+.jf-modal-confirm {
+    background: #e03131;
+    color: #fff;
+}
+
+.jf-modal-confirm:hover {
+    background: #c92a2a;
+}
+
+.jf-modal-cancel:active,
+.jf-modal-confirm:active {
+    transform: scale(.97);
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(18px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
 }

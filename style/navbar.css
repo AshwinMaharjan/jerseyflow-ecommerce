@@ -386,3 +386,22 @@
   .jf-cart-btn span.cart-label { display: none; }
   .jf-cart-btn { padding: 0 12px; gap: 6px; }
 }
+
+
+/* ── Profile Image Avatar ──────────────────────────────────── */
+
+.jf-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--jf-accent, #e8ff00);
+  display: block;
+  flex-shrink: 0;
+}
+
+.jf-avatar-img--lg {
+  width: 48px;
+  height: 48px;
+}

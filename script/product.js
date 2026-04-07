@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cartBtn.disabled = true;
         cartBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding…';
 
-        fetch('cart_actions.php', { method: 'POST', body: formData })
+        fetch('/jerseyflow-ecommerce/users/cart_actions.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {

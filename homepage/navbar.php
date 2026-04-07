@@ -3,23 +3,111 @@
  * JerseyFlow — Navbar Component
  * File: navbar.php
  *
- * Usage: <?php include 'navbar.php'; ?>
- *
- * Cart count is read from $_SESSION['cart_count'].
- * Make sure session_start() is called before including this file.
+ * Requirements:
+ *  - session_start() must be called before including this file
+ *  - $conn (MySQLi connection) must be available
  */
 
-// Cart item count from session (default 0)
-$cart_count = isset($_SESSION['cart_count']) ? (int) $_SESSION['cart_count'] : 0;
+// ─────────────────────────────────────────────
+// CHECK LOGIN
+// ─────────────────────────────────────────────
+$is_logged_in = isset($_SESSION['user_id']);
 
-// Current page for active-link highlighting
+// ─────────────────────────────────────────────
+// CART COUNT (ONLY LOGGED IN USERS)
+// ─────────────────────────────────────────────
+$cart_count = 0;
+
+if ($is_logged_in) {
+    $uid = (int) $_SESSION['user_id'];
+
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $stmt->bind_result($cart_count);
+    $stmt->fetch();
+    $stmt->close();
+}
+
+// ─────────────────────────────────────────────
+// ACTIVE PAGE
+// ─────────────────────────────────────────────
 $current_page = basename($_SERVER['PHP_SELF']);
-?>
 
+// ─────────────────────────────────────────────
+// USER DATA
+// ─────────────────────────────────────────────
+$user_name     = '';
+$user_email    = '';
+$user_role     = null;
+$profile_image = null;
+$avatar_src    = null;
+$initials      = '';
+$profile_url   = '/login.php';
+$change_pw_url = '/login.php';
+$account_url   = '/login.php';
+
+if ($is_logged_in) {
+
+    $uid = (int) $_SESSION['user_id'];
+
+    // ── ROLE (session first, fallback DB) ──
+    if (isset($_SESSION['role'])) {
+        $user_role = $_SESSION['role'];
+    } else {
+        $stmt = $conn->prepare("SELECT role FROM users WHERE user_id = ?");
+        $stmt->bind_param("i", $uid);
+        $stmt->execute();
+        $stmt->bind_result($user_role);
+        $stmt->fetch();
+        $stmt->close();
+
+        $_SESSION['role'] = $user_role;
+    }
+
+    // ─────────────────────────────────────────────
+    // ROLE BASED ROUTING (PROFILE + CHANGE PASSWORD)
+    // ─────────────────────────────────────────────
+    if ($user_role === 'admin') {
+        $profile_url   = '/jerseyflow-ecommerce/admin/admin_profile.php';
+        $change_pw_url = '/jerseyflow-ecommerce/admin/admin_change_pw.php';
+        $account_url = '/jerseyflow-ecommerce/admin/admin_homepage.php';
+    } else {
+        $profile_url   = '/jerseyflow-ecommerce/users/users_profile.php';
+        $change_pw_url = '/jerseyflow-ecommerce/users/users_change_pw.php';
+        $account_url = '/jerseyflow-ecommerce/users/users_homepage.php';
+    }
+
+    // ── USER DETAILS ──
+    $stmt = $conn->prepare("SELECT full_name, email, profile_image FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $stmt->bind_result($user_name, $user_email, $profile_image);
+    $stmt->fetch();
+    $stmt->close();
+
+    // ── INITIALS ──
+    $name_parts = explode(' ', trim($user_name));
+    $initials = strtoupper(
+        substr($name_parts[0] ?? '', 0, 1) .
+        substr($name_parts[1] ?? '', 0, 1)
+    );
+
+    // ── PROFILE IMAGE ──
+    if (!empty($profile_image)) {
+        $file_path = $_SERVER['DOCUMENT_ROOT'] . '/jerseyflow-ecommerce/uploads/' . $profile_image;
+
+        if (file_exists($file_path)) {
+            $avatar_src = '/jerseyflow-ecommerce/uploads/' . htmlspecialchars($profile_image);
+        }
+    }
+}
+?>
 <!-- Font Awesome CDN -->
 <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">
 <!-- Navbar CSS -->
 <link rel="stylesheet" href="style/navbar.css" />
+<link rel="stylesheet" href="style/users_navbar.css" />
 
 <!-- ══════════════════════════ NAVBAR ══════════════════════════ -->
 <nav class="jf-nav" id="jfNav">
@@ -54,10 +142,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="/jerseyflow-ecommerce/jersey.php?type=player_edition">
           <i class="fa-solid fa-user drop-icon"></i>
           Player Edition Jersey
-          <a href="/jerseyflow-ecommerce/jersey.php?type=worldcup_2026">
-            <i class="fa-solid fa-trophy drop-icon"></i>
-            FIFA World Cup 2026 Jersey
-          </a>
+        </a>
+        <a href="/jerseyflow-ecommerce/jersey.php?type=worldcup_2026">
+          <i class="fa-solid fa-trophy drop-icon"></i>
+          FIFA World Cup 2026 Jersey
         </a>
       </div>
     </li>
@@ -99,6 +187,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
       </div>
     </li>
+
     <!-- About -->
     <li>
       <a href="/jerseyflow-ecommerce/about.php" class="<?= ($current_page === 'about.php') ? 'active' : '' ?>">
@@ -113,27 +202,110 @@ $current_page = basename($_SERVER['PHP_SELF']);
       </a>
     </li>
 
-
   </ul>
 
   <!-- ── Right Actions ─────────────────────────────────────────── -->
   <div class="jf-actions">
 
-    <!-- Profile Icon -->
-    <a href="/jerseyflow-ecommerce/login.php" class="jf-icon-btn" aria-label="My Account">
-      <i class="fa-regular fa-circle-user"></i>
-    </a>
+    <?php if ($is_logged_in): ?>
+    <!-- ════════════════════════════════════════════════════════
+         LOGGED IN: profile dropdown + live cart count
+    ════════════════════════════════════════════════════════ -->
 
-    <div class="jf-divider"></div>
+      <!-- Profile Dropdown -->
+      <div class="jf-profile-wrap">
 
-    <!-- Cart Button -->
-    <a href="/jerseyflow-ecommerce/users/cart.php" class="jf-cart-btn" id="jfCartBtn" aria-label="View Cart">
-      <i class="fa-solid fa-cart-shopping"></i>
-      <span class="cart-label">Cart</span>
-      <span class="jf-cart-count" id="jfCartCount">
-        <?= $cart_count ?>
-      </span>
-    </a>
+        <!-- Trigger: profile photo or initials fallback -->
+        <button class="jf-icon-btn jf-profile-trigger" aria-label="My Account" aria-haspopup="true">
+          <?php if ($avatar_src): ?>
+            <img
+              src="<?= $avatar_src ?>"
+              alt="<?= htmlspecialchars($user_name) ?>"
+              class="jf-avatar-img"
+            />
+          <?php else: ?>
+            <span class="jf-avatar"><?= htmlspecialchars($initials) ?></span>
+          <?php endif; ?>
+        </button>
+
+        <!-- Dropdown menu -->
+        <div class="jf-profile-dropdown">
+
+          <!-- User info header -->
+          <div class="jf-profile-head">
+            <?php if ($avatar_src): ?>
+              <img
+                src="<?= $avatar_src ?>"
+                alt="<?= htmlspecialchars($user_name) ?>"
+                class="jf-avatar-img jf-avatar-img--lg"
+              />
+            <?php else: ?>
+              <div class="jf-avatar jf-avatar--lg"><?= htmlspecialchars($initials) ?></div>
+            <?php endif; ?>
+            <div class="jf-profile-info">
+              <span class="jf-profile-name"><?= htmlspecialchars($user_name) ?></span>
+              <?php if ($user_email): ?>
+                <span class="jf-profile-email"><?= htmlspecialchars($user_email) ?></span>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <hr class="jf-profile-divider" />
+
+          <a href="<?= $account_url ?>" class="jf-profile-item">
+            <i class="fa-regular fa-house"></i>
+            My Account
+          </a>
+          <a href="<?= $profile_url ?>" class="jf-profile-item">
+            <i class="fa-regular fa-circle-user"></i>
+            My Profile
+          </a>
+          <a href="<?= $change_pw_url ?>" class="jf-profile-item">
+            <i class="fa-solid fa-lock"></i>
+            Change Password
+          </a>
+
+          <hr class="jf-profile-divider" />
+
+          <a href="#" class="jf-profile-item jf-profile-logout"
+             onclick="jfOpenLogoutModal(); return false;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+          </a>
+
+        </div>
+      </div>
+      <!-- End Profile Dropdown -->
+
+      <div class="jf-divider"></div>
+
+      <!-- Cart Button with live count -->
+      <a href="/jerseyflow-ecommerce/users/cart.php" class="jf-cart-btn" id="jfCartBtn" aria-label="View Cart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="cart-label">Cart</span>
+        <span class="jf-cart-count" id="jfCartCount"><?= $cart_count ?></span>
+      </a>
+
+    <?php else: ?>
+    <!-- ════════════════════════════════════════════════════════
+         NOT LOGGED IN: plain profile icon linking to login
+    ════════════════════════════════════════════════════════ -->
+
+      <!-- Profile Icon → Login page -->
+      <a href="/jerseyflow-ecommerce/login.php" class="jf-icon-btn" aria-label="My Account">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
+
+      <div class="jf-divider"></div>
+
+      <!-- Cart Button (count stays 0 for guests) -->
+      <a href="/jerseyflow-ecommerce/users/cart.php" class="jf-cart-btn" id="jfCartBtn" aria-label="View Cart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="cart-label">Cart</span>
+        <span class="jf-cart-count" id="jfCartCount">0</span>
+      </a>
+
+    <?php endif; ?>
 
     <div class="jf-divider"></div>
 
@@ -179,11 +351,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </button>
         <div class="jf-mobile-sub" id="mobJersey">
           <ul>
+            <li><a href="jersey.php?type=standard"><i class="fa-solid fa-shield-halved drop-icon"></i> Football Club Jersey</a></li>
             <li><a href="jersey.php?type=worldcup_2026"><i class="fa-solid fa-trophy drop-icon"></i> FIFA World Cup 2026 Jersey</a></li>
             <li><a href="jersey.php?type=retro"><i class="fa-solid fa-clock-rotate-left drop-icon"></i> Football Retro Jersey</a></li>
             <li><a href="jersey.php?type=country"><i class="fa-solid fa-earth-americas drop-icon"></i> Football Country Jersey</a></li>
             <li><a href="jersey.php?type=keeper"><i class="fa-solid fa-hands drop-icon"></i> Keeper Jersey</a></li>
-            <li><a href="jersey.php?type=standard"><i class="fa-solid fa-shield-halved drop-icon"></i> Football Club Jersey</a></li>
           </ul>
         </div>
       </li>
@@ -210,5 +382,119 @@ $current_page = basename($_SERVER['PHP_SELF']);
   </div>
 </div>
 
+<?php if ($is_logged_in): ?>
+<!-- ══════════════════════ LOGOUT MODAL ═══════════════════════
+     Only rendered when user is logged in
+════════════════════════════════════════════════════════════ -->
+<div id="jfLogoutModal" role="dialog" aria-modal="true" aria-labelledby="jfLogoutTitle">
+  <div class="jf-logout-box">
+    <div class="jf-logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+    <h2 id="jfLogoutTitle">Confirm Logout</h2>
+    <p>Are you sure you want to log out of your account?</p>
+    <div class="jf-logout-actions">
+      <button class="jf-logout-cancel" onclick="jfCloseLogoutModal()">Cancel</button>
+      <a href="/jerseyflow-ecommerce/logout.php" class="jf-logout-confirm">Logout</a>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- ══════════════════════════ JS ══════════════════════════════ -->
 <script src="../script/navbar.js"></script>
+<script>
+(function () {
+
+  /* Sticky shadow */
+  const nav = document.getElementById('jfNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  /* Search expand */
+  const searchWrap  = document.getElementById('jfSearchWrap');
+  const searchBtn   = document.getElementById('jfSearchBtn');
+  const searchInput = document.getElementById('jfSearchInput');
+
+  searchBtn.addEventListener('click', () => {
+    const isOpen = searchWrap.classList.toggle('open');
+    if (isOpen) searchInput.focus();
+    else searchInput.value = '';
+  });
+  document.addEventListener('click', e => {
+    if (!searchWrap.contains(e.target)) {
+      searchWrap.classList.remove('open');
+      searchInput.value = '';
+    }
+  });
+
+  /* Search submit on Enter */
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && searchInput.value.trim()) {
+      window.location.href = 'search.php?q=' + encodeURIComponent(searchInput.value.trim());
+    }
+  });
+
+  /* Hamburger */
+  const hamburger  = document.getElementById('jfHamburger');
+  const mobileMenu = document.getElementById('jfMobileMenu');
+
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    mobileMenu.setAttribute('aria-hidden', !open);
+  });
+
+  /* Mobile accordion */
+  document.querySelectorAll('.mob-link[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sub = document.getElementById(btn.dataset.target);
+      const isOpen = sub.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+    });
+  });
+
+  /* Cart count helper */
+  const cartCountEl = document.getElementById('jfCartCount');
+  const cartBtn     = document.getElementById('jfCartBtn');
+
+  window.JFCart = {
+    get count () { return parseInt(cartCountEl.textContent, 10) || 0; },
+    add (n = 1) {
+      cartCountEl.textContent = this.count + n;
+      cartBtn.classList.remove('bump');
+      void cartBtn.offsetWidth;
+      cartBtn.classList.add('bump');
+      cartBtn.addEventListener('animationend', () => cartBtn.classList.remove('bump'), { once: true });
+    }
+  };
+
+  <?php if ($is_logged_in): ?>
+  /* ── Logout modal helpers (logged-in users only) ──────────── */
+  const logoutModal = document.getElementById('jfLogoutModal');
+
+  window.jfOpenLogoutModal = function () {
+    logoutModal.style.display = 'flex';
+    setTimeout(() => {
+      const cancel = logoutModal.querySelector('.jf-logout-cancel');
+      if (cancel) cancel.focus();
+    }, 50);
+  };
+
+  window.jfCloseLogoutModal = function () {
+    logoutModal.style.display = 'none';
+  };
+
+  logoutModal.addEventListener('click', function (e) {
+    if (e.target === logoutModal) jfCloseLogoutModal();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && logoutModal.style.display === 'flex') {
+      jfCloseLogoutModal();
+    }
+  });
+  <?php endif; ?>
+
+})();
+</script>

@@ -92,7 +92,7 @@ $type_labels = [
         <i class="fa-solid fa-cart-shopping empty-icon"></i>
         <h2>Your cart is empty</h2>
         <p>Looks like you haven't added any jerseys yet.</p>
-        <a href="../jersey.php" class="btn-shop">Browse Jerseys</a>
+        <a href="jersey.php" class="btn-shop">Browse Jerseys</a>
     </div>
 
     <?php else: ?>

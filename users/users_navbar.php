@@ -1,352 +1,480 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>JerseyFlow — Customer Navbar</title>
-    <link rel="icon" href="/jerseyflow-ecommerce/images/logo_icon.ico?v=2">
-    <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="../assets/fonts/barlow-condensed/barlow-condensed.css">
-    <link rel="stylesheet" href="../style/footer.css">
-    <link rel="stylesheet" href="../style/cart.css">
-    <link rel="stylesheet" href="../style/user_navbar.css">
+<?php
+/**
+ * JerseyFlow — Navbar Component
+ * File: navbar.php
+ *
+ * Requirements:
+ *  - session_start() must be called before including this file
+ *  - $conn (MySQLi connection) must be available
+ */
 
-</head>
-<body>
+// ─────────────────────────────────────────────
+// CART COUNT
+// ─────────────────────────────────────────────
+$cart_count = 0;
 
-<!-- ══════════════════════════════════════════════════════════
-     CUSTOMER NAVBAR
-══════════════════════════════════════════════════════════ -->
-<nav class="users-nav" id="usersNav">
+if (isset($_SESSION['user_id'])) {
+    $uid = (int) $_SESSION['user_id'];
 
-  <!-- ── LEFT: LOGO ─────────────────────────────────────── -->
-  <div class="nav-logo">
-    <a href="/jerseyflow-ecommerce/index.php">
-      <div class="logo-icon"><i class="fa-solid fa-shirt"></i></div>
-      <span>JerseyFlow</span>
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $stmt->bind_result($cart_count);
+    $stmt->fetch();
+    $stmt->close();
+}
+
+// ─────────────────────────────────────────────
+// CURRENT PAGE
+// ─────────────────────────────────────────────
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// ─────────────────────────────────────────────
+// DEFAULT VALUES
+// ─────────────────────────────────────────────
+$user_name     = 'Guest';
+$user_email    = '';
+$profile_image = null;
+$user_role     = null;
+
+// ROLE-BASED URLS (DEFAULT = USER)
+$account_url = "/jerseyflow-ecommerce/users/users_homepage.php";
+$profile_url = "/jerseyflow-ecommerce/users/users_profile.php";
+$change_pw_url = "/jerseyflow-ecommerce/users/users_change_pw.php";
+
+// ─────────────────────────────────────────────
+// USER DATA
+// ─────────────────────────────────────────────
+if (isset($_SESSION['user_id'])) {
+
+    $uid = (int) $_SESSION['user_id'];
+
+    // ROLE (session first, DB fallback)
+    if (isset($_SESSION['role'])) {
+        $user_role = $_SESSION['role'];
+    } else {
+        $stmt = $conn->prepare("SELECT role FROM users WHERE user_id = ?");
+        $stmt->bind_param("i", $uid);
+        $stmt->execute();
+        $stmt->bind_result($user_role);
+        $stmt->fetch();
+        $stmt->close();
+
+        $_SESSION['role'] = $user_role;
+    }
+
+    // FETCH USER INFO
+    $stmt = $conn->prepare("SELECT full_name, email, profile_image FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $stmt->bind_result($user_name, $user_email, $profile_image);
+    $stmt->fetch();
+    $stmt->close();
+
+    // ─────────────────────────────────────────────
+    // ROLE BASED ROUTING (ALL LINKS)
+    // ─────────────────────────────────────────────
+    if ($user_role === 'admin') {
+
+        $account_url   = "/jerseyflow-ecommerce/admin/admin_homepage.php";
+        $profile_url   = "/jerseyflow-ecommerce/admin/admin_profile.php";
+        $change_pw_url = "/jerseyflow-ecommerce/admin/admin_change_pw.php";
+
+    } else {
+
+        $account_url   = "/jerseyflow-ecommerce/users/users_homepage.php";
+        $profile_url   = "/jerseyflow-ecommerce/users/users_profile.php";
+        $change_pw_url = "/jerseyflow-ecommerce/users/users_change_pw.php";
+    }
+}
+
+// ─────────────────────────────────────────────
+// INITIALS
+// ─────────────────────────────────────────────
+$name_parts = explode(' ', trim($user_name));
+$initials = strtoupper(
+    substr($name_parts[0] ?? '', 0, 1) .
+    substr($name_parts[1] ?? '', 0, 1)
+);
+
+// ─────────────────────────────────────────────
+// PROFILE IMAGE
+// ─────────────────────────────────────────────
+$avatar_src = null;
+
+if (!empty($profile_image)) {
+    $file_path = $_SERVER['DOCUMENT_ROOT'] . '/jerseyflow-ecommerce/uploads/' . $profile_image;
+
+    if (file_exists($file_path)) {
+        $avatar_src = '/jerseyflow-ecommerce/uploads/' . htmlspecialchars($profile_image);
+    }
+}
+?>
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
+<!-- Navbar CSS -->
+<link rel="stylesheet" href="../style/navbar.css" />
+<link rel="stylesheet" href="../style/users_navbar.css" />
+
+<!-- ══════════════════════════ NAVBAR ══════════════════════════ -->
+<nav class="jf-nav" id="jfNav">
+
+  <!-- ── Logo ─────────────────────────────────────────────────── -->
+  <a href="../homepage.php" class="jf-logo" aria-label="JerseyFlow Home">
+    <img src="/jerseyflow-ecommerce/images/logo.png" alt="JerseyFlow Admin" />
+  </a>
+
+  <!-- ── Center Links ──────────────────────────────────────────── -->
+  <ul class="jf-links">
+
+    <!-- Jersey (dropdown) -->
+    <li class="has-drop">
+      <a href="/jerseyflow-ecommerce/jersey.php">
+        Jersey
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </a>
+      <div class="jf-dropdown">
+        <a href="/jerseyflow-ecommerce/jersey.php?type=standard">
+          <i class="fa-solid fa-shield-halved drop-icon"></i>
+          Football Club Jersey
+        </a>
+        <a href="/jerseyflow-ecommerce/jersey.php?type=worldcup_2026">
+          <i class="fa-solid fa-trophy drop-icon"></i>
+          FIFA World Cup 2026 Jersey
+        </a>
+        <a href="/jerseyflow-ecommerce/jersey.php?type=retro">
+          <i class="fa-solid fa-clock-rotate-left drop-icon"></i>
+          Football Retro Jersey
+        </a>
+        <a href="/jerseyflow-ecommerce/jersey.php?type=country">
+          <i class="fa-solid fa-earth-americas drop-icon"></i>
+          Football Country Jersey
+        </a>
+        <a href="/jerseyflow-ecommerce/jersey.php?type=limited">
+          <i class="fa-solid fa-crown drop-icon"></i>
+          Limited Edition Jersey
+        </a>
+      </div>
+    </li>
+
+    <!-- Club (dropdown) -->
+    <li class="has-drop">
+      <a href="/jerseyflow-ecommerce/clubs.php">
+        Club
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </a>
+      <div class="jf-dropdown">
+        <a href="/jerseyflow-ecommerce/clubs.php?club=realmadrid">
+          <i class="fa-solid fa-star drop-icon"></i>
+          Real Madrid
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=fcbarcelona">
+          <i class="fa-solid fa-star drop-icon"></i>
+          FC Barcelona
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=manchesterunited">
+          <i class="fa-solid fa-star drop-icon"></i>
+          Manchester United
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=arsenalfc">
+          <i class="fa-solid fa-star drop-icon"></i>
+          Arsenal
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=liverpoolfc">
+          <i class="fa-solid fa-star drop-icon"></i>
+          Liverpool FC
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=acmilan">
+          <i class="fa-solid fa-star drop-icon"></i>
+          AC Milan
+        </a>
+        <a href="/jerseyflow-ecommerce/clubs.php?club=juventus">
+          <i class="fa-solid fa-star drop-icon"></i>
+          Juventus
+        </a>
+      </div>
+    </li>
+
+    <!-- About -->
+    <li>
+      <a href="/jerseyflow-ecommerce/about.php" class="<?= ($current_page === 'about.php') ? 'active' : '' ?>">
+        About
+      </a>
+    </li>
+
+    <!-- Contact -->
+    <li>
+      <a href="/jerseyflow-ecommerce/contact.php" class="<?= ($current_page === 'contact.php') ? 'active' : '' ?>">
+        Contact
+      </a>
+    </li>
+
+  </ul>
+
+  <!-- ── Right Actions ─────────────────────────────────────────── -->
+  <div class="jf-actions">
+
+    <!-- ── Profile Dropdown ───────────────────────────────────── -->
+    <div class="jf-profile-wrap">
+
+      <!-- Trigger: profile photo or initials fallback -->
+      <button class="jf-icon-btn jf-profile-trigger" aria-label="My Account" aria-haspopup="true">
+        <?php if ($avatar_src): ?>
+          <img
+            src="<?= $avatar_src ?>"
+            alt="<?= htmlspecialchars($user_name) ?>"
+            class="jf-avatar-img"
+          />
+        <?php else: ?>
+          <span class="jf-avatar"><?= htmlspecialchars($initials) ?></span>
+        <?php endif; ?>
+      </button>
+
+      <!-- Dropdown menu -->
+      <div class="jf-profile-dropdown">
+
+        <!-- User info header -->
+        <div class="jf-profile-head">
+          <?php if ($avatar_src): ?>
+            <img
+              src="<?= $avatar_src ?>"
+              alt="<?= htmlspecialchars($user_name) ?>"
+              class="jf-avatar-img jf-avatar-img--lg"
+            />
+          <?php else: ?>
+            <div class="jf-avatar jf-avatar--lg"><?= htmlspecialchars($initials) ?></div>
+          <?php endif; ?>
+          <div class="jf-profile-info">
+            <span class="jf-profile-name"><?= htmlspecialchars($user_name) ?></span>
+            <?php if ($user_email): ?>
+              <span class="jf-profile-email"><?= htmlspecialchars($user_email) ?></span>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <hr class="jf-profile-divider" />
+
+        <!-- Menu links -->
+        <a href="<?= $account_url ?>" class="jf-profile-item">
+          <i class="fa-regular fa-house"></i>
+          My Account
+        </a>
+        <a href="<?= $profile_url ?>" class="jf-profile-item">
+          <i class="fa-regular fa-circle-user"></i>
+          My Profile
+        </a>
+        <a href="<?= $change_pw_url ?>" class="jf-profile-item">
+          <i class="fa-solid fa-lock"></i>
+          Change Password
+        </a>
+
+        <hr class="jf-profile-divider" />
+
+        <a href="#" class="jf-profile-item jf-profile-logout"
+           onclick="jfOpenLogoutModal(); return false;">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          Logout
+        </a>
+
+      </div>
+    </div>
+    <!-- ── End Profile Dropdown ───────────────────────────────── -->
+
+    <div class="jf-divider"></div>
+
+    <!-- Cart Button -->
+    <a href="/jerseyflow-ecommerce/users/cart.php" class="jf-cart-btn" id="jfCartBtn" aria-label="View Cart">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="cart-label">Cart</span>
+      <span class="jf-cart-count" id="jfCartCount">
+        <?= $cart_count ?>
+      </span>
     </a>
-  </div>
 
-  <!-- ── CENTER: SEARCH ─────────────────────────────────── -->
-  <div class="nav-search-wrap">
-    <div class="nav-search">
+    <div class="jf-divider"></div>
+
+    <!-- Search -->
+    <div class="jf-search-wrap" id="jfSearchWrap">
+      <button class="jf-search-btn" id="jfSearchBtn" aria-label="Search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
       <input
+        class="jf-search-input"
+        id="jfSearchInput"
         type="text"
-        id="searchInput"
-        placeholder="Search jerseys, teams, players..."
+        placeholder="Search jerseys…"
         autocomplete="off"
       />
-      <button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
 
-    <!-- Search suggestions -->
-    <div class="search-suggestions" id="searchSuggestions">
-      <div class="suggestion-label">Popular searches</div>
-      <div class="suggestion-item"><i class="fa-solid fa-fire"></i> Real Madrid 2024/25 Kit</div>
-      <div class="suggestion-item"><i class="fa-solid fa-fire"></i> Manchester City Home Jersey</div>
-      <div class="suggestion-item"><i class="fa-solid fa-clock-rotate-left"></i> Barcelona Away Kit</div>
-      <div class="suggestion-item"><i class="fa-solid fa-clock-rotate-left"></i> PSG 2025 Third Kit</div>
-      <div class="suggestion-item"><i class="fa-solid fa-magnifying-glass"></i> Argentina World Cup Jersey</div>
-    </div>
-  </div>
-
-  <!-- ── RIGHT: ACTIONS ─────────────────────────────────── -->
-  <div class="nav-actions">
-
-    <!-- 🤍 Wishlist -->
-    <button class="nav-icon" onclick="window.location='/jerseyflow-ecommerce/wishlist.php'" aria-label="Wishlist">
-      <i class="fa-regular fa-heart"></i>
-      <span class="badge" id="wishlistCount">3</span>
-    </button>
-
-    <!-- 🛒 Cart -->
-    <div class="dropdown" id="cartDropdown">
-      <button class="nav-icon" aria-label="Cart" onclick="toggleDropdown('cartDropdown')">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span class="badge" id="cartCount">2</span>
-      </button>
-
-      <div class="dropdown-menu cart-dropdown">
-        <div class="cart-header">
-          <h4>Shopping Cart</h4>
-          <span id="cartItemsLabel">2 items</span>
-        </div>
-
-        <div class="cart-items" id="cartItemsList">
-          <!-- Item 1 -->
-          <div class="cart-item" data-id="1">
-            <div class="cart-thumb">🔴</div>
-            <div class="cart-info">
-              <div class="item-name">Manchester United Home Jersey</div>
-              <div class="item-meta">Size: L &nbsp;·&nbsp; Qty: 1</div>
-              <div class="item-price">NPR 4,500</div>
-            </div>
-            <button class="cart-remove" onclick="removeCartItem(1)" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-          <!-- Item 2 -->
-          <div class="cart-item" data-id="2">
-            <div class="cart-thumb">🔵</div>
-            <div class="cart-info">
-              <div class="item-name">Real Madrid Away Kit 2025</div>
-              <div class="item-meta">Size: M &nbsp;·&nbsp; Qty: 1</div>
-              <div class="item-price">NPR 5,200</div>
-            </div>
-            <button class="cart-remove" onclick="removeCartItem(2)" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-        </div>
-
-        <div class="cart-footer">
-          <div class="cart-total">
-            <span class="label">Total</span>
-            <span class="amount" id="cartTotal">NPR 9,700</span>
-          </div>
-          <div class="cart-btns">
-            <a href="/jerseyflow-ecommerce/cart.php" class="btn-outline">View Cart</a>
-            <a href="/jerseyflow-ecommerce/checkout.php" class="btn-fill">Checkout</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 🔔 Notifications -->
-    <div class="dropdown" id="notifDropdown">
-      <button class="nav-icon" aria-label="Notifications" onclick="toggleDropdown('notifDropdown')">
-        <i class="fa-regular fa-bell"></i>
-        <span class="badge" id="notifCount">2</span>
-      </button>
-
-      <div class="dropdown-menu notif-dropdown">
-        <div class="notif-header">
-          <h4>Notifications</h4>
-          <button class="notif-mark" onclick="markAllRead()">Mark all read</button>
-        </div>
-
-        <div class="notif-list">
-          <div class="notif-item unread">
-            <div class="notif-icon shipped"><i class="fa-solid fa-truck"></i></div>
-            <div class="notif-body">
-              <div class="notif-title">Order Shipped!</div>
-              <div class="notif-sub">Your Manchester United jersey is on its way.</div>
-              <div class="notif-time">2 hours ago</div>
-            </div>
-            <div class="notif-dot"></div>
-          </div>
-
-          <div class="notif-item unread">
-            <div class="notif-icon offer"><i class="fa-solid fa-tag"></i></div>
-            <div class="notif-body">
-              <div class="notif-title">Flash Sale — 20% Off!</div>
-              <div class="notif-sub">La Liga jerseys on sale for 24 hours only.</div>
-              <div class="notif-time">5 hours ago</div>
-            </div>
-            <div class="notif-dot"></div>
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon delivered"><i class="fa-solid fa-circle-check"></i></div>
-            <div class="notif-body">
-              <div class="notif-title">Order Delivered</div>
-              <div class="notif-sub">Your Barcelona home kit has been delivered.</div>
-              <div class="notif-time">Yesterday</div>
-            </div>
-            <div class="notif-dot"></div>
-          </div>
-        </div>
-
-        <div class="notif-footer">
-          <a href="/jerseyflow-ecommerce/notifications.php">View All Notifications</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- 👤 Profile -->
-    <div class="dropdown" id="profileDropdown">
-      <button class="nav-icon" onclick="toggleDropdown('profileDropdown')" aria-label="Profile">
-        <div class="profile-trigger">
-          <div class="avatar-sm">JD</div>
-          <span class="user-name">John</span>
-          <i class="fa-solid fa-chevron-down caret"></i>
-        </div>
-      </button>
-
-      <div class="dropdown-menu profile-dropdown">
-        <div class="profile-header">
-          <div class="profile-avatar">JD</div>
-          <div class="profile-info">
-            <div class="name">John Doe</div>
-            <div class="email">johndoe@email.com</div>
-          </div>
-        </div>
-
-        <div class="profile-menu-items">
-          <a href="/jerseyflow-ecommerce/dashboard.php">
-            <i class="fa-solid fa-gauge-high"></i> Dashboard
-          </a>
-          <a href="/jerseyflow-ecommerce/orders.php">
-            <i class="fa-solid fa-box-open"></i> My Orders
-          </a>
-          <a href="/jerseyflow-ecommerce/track-order.php">
-            <i class="fa-solid fa-location-dot"></i> Track Order
-          </a>
-          <a href="/jerseyflow-ecommerce/wishlist.php">
-            <i class="fa-regular fa-heart"></i> Wishlist
-          </a>
-          <a href="/jerseyflow-ecommerce/profile-settings.php">
-            <i class="fa-solid fa-gear"></i> Profile Settings
-          </a>
-          <hr />
-          <a href="#" class="logout-link" onclick="openLogoutModal(); return false;">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ☰ Hamburger (mobile) -->
-    <button class="hamburger" id="hamburger" onclick="toggleMobileDrawer()" aria-label="Menu">
+    <!-- Hamburger (mobile) -->
+    <button class="jf-hamburger" id="jfHamburger" aria-label="Toggle Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
 
   </div>
 </nav>
 
-<!-- ── MOBILE DRAWER ────────────────────────────────────────── -->
-<div class="mobile-drawer" id="mobileDrawer">
-  <div class="mobile-search">
-    <input type="text" placeholder="Search jerseys, teams, players..." />
-    <button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-  </div>
+<!-- ══════════════════════ MOBILE MENU ════════════════════════ -->
+<div class="jf-mobile-menu" id="jfMobileMenu" aria-hidden="true">
+  <div class="jf-mobile-inner">
+    <ul>
 
-  <nav class="mobile-nav-links">
-    <a href="/jerseyflow-ecommerce/dashboard.php"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="/jerseyflow-ecommerce/orders.php"><i class="fa-solid fa-box-open"></i> My Orders</a>
-    <a href="/jerseyflow-ecommerce/track-order.php"><i class="fa-solid fa-location-dot"></i> Track Order</a>
-    <a href="/jerseyflow-ecommerce/wishlist.php"><i class="fa-regular fa-heart"></i> Wishlist</a>
-    <a href="/jerseyflow-ecommerce/cart.php"><i class="fa-solid fa-bag-shopping"></i> Cart <span id="mobileCartBadge">(2)</span></a>
-    <a href="/jerseyflow-ecommerce/profile-settings.php"><i class="fa-solid fa-gear"></i> Profile Settings</a>
-    <hr />
-    <a href="#" class="logout-mobile" onclick="openLogoutModal(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-  </nav>
+      <li>
+        <a href="about.php" class="mob-link">About</a>
+      </li>
+
+      <li>
+        <a href="contact.php" class="mob-link">Contact</a>
+      </li>
+
+      <!-- Jersey accordion -->
+      <li>
+        <button class="mob-link" data-target="mobJersey">
+          Jersey <i class="fa-solid fa-chevron-down chev"></i>
+        </button>
+        <div class="jf-mobile-sub" id="mobJersey">
+          <ul>
+            <li><a href="jersey.php?type=standard"><i class="fa-solid fa-shield-halved drop-icon"></i> Football Club Jersey</a></li>
+            <li><a href="jersey.php?type=worldcup-2026"><i class="fa-solid fa-trophy drop-icon"></i> FIFA World Cup 2026 Jersey</a></li>
+            <li><a href="jersey.php?type=retro"><i class="fa-solid fa-clock-rotate-left drop-icon"></i> Football Retro Jersey</a></li>
+            <li><a href="jersey.php?type=country"><i class="fa-solid fa-earth-americas drop-icon"></i> Football Country Jersey</a></li>
+            <li><a href="jersey.php?type=keeper"><i class="fa-solid fa-hands drop-icon"></i> Keeper Jersey</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- Club accordion -->
+      <li>
+        <button class="mob-link" data-target="mobClub">
+          Club <i class="fa-solid fa-chevron-down chev"></i>
+        </button>
+        <div class="jf-mobile-sub" id="mobClub">
+          <ul>
+            <li><a href="clubs.php?club=realmadrid"><i class="fa-solid fa-star drop-icon"></i> Real Madrid</a></li>
+            <li><a href="clubs.php?club=fcbarcelona"><i class="fa-solid fa-star drop-icon"></i> FC Barcelona</a></li>
+            <li><a href="clubs.php?club=manchester-united"><i class="fa-solid fa-star drop-icon"></i> Manchester United</a></li>
+            <li><a href="clubs.php?club=arsenal"><i class="fa-solid fa-star drop-icon"></i> Arsenal</a></li>
+            <li><a href="clubs.php?club=liverpool"><i class="fa-solid fa-star drop-icon"></i> Liverpool FC</a></li>
+            <li><a href="clubs.php?club=ac_milan"><i class="fa-solid fa-star drop-icon"></i> AC Milan</a></li>
+            <li><a href="clubs.php?club=juventus"><i class="fa-solid fa-star drop-icon"></i> Juventus</a></li>
+          </ul>
+        </div>
+      </li>
+
+    </ul>
+  </div>
 </div>
 
-<!-- ── LOGOUT MODAL ─────────────────────────────────────────── -->
-<div id="logoutModal">
-  <div class="logout-box">
-    <div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
-    <h2>Confirm Logout</h2>
+<!-- ══════════════════════ LOGOUT MODAL ═══════════════════════ -->
+<div id="jfLogoutModal" role="dialog" aria-modal="true" aria-labelledby="jfLogoutTitle">
+  <div class="jf-logout-box">
+    <div class="jf-logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+    <h2 id="jfLogoutTitle">Confirm Logout</h2>
     <p>Are you sure you want to log out of your account?</p>
-    <div class="logout-actions">
-      <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
-      <a href="/jerseyflow-ecommerce/logout.php" class="logout-btn">Logout</a>
+    <div class="jf-logout-actions">
+      <button class="jf-logout-cancel" onclick="jfCloseLogoutModal()">Cancel</button>
+      <a href="/jerseyflow-ecommerce/logout.php" class="jf-logout-confirm">Logout</a>
     </div>
   </div>
 </div>
 
-<!-- ── DEMO CONTENT ─────────────────────────────────────────── -->
-<div class="page-demo">
-  <i class="fa-solid fa-shirt"></i>
-  <p><strong>JerseyFlow</strong> — Customer Navbar Demo</p>
-  <p style="font-size:.8rem">Click the icons on the right to interact with the dropdowns.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════ JS ══════════════════════════════ -->
+<script src="../script/users_navbar.js"></script>
 <script>
-/* ── DROPDOWN TOGGLE ─────────────────────────────────────── */
-function toggleDropdown(id) {
-  const target = document.getElementById(id);
-  const allDropdowns = document.querySelectorAll('.dropdown.open');
+(function () {
+  /* Sticky shadow */
+  const nav = document.getElementById('jfNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
 
-  allDropdowns.forEach(d => {
-    if (d !== target) d.classList.remove('open');
+  /* Search expand */
+  const searchWrap  = document.getElementById('jfSearchWrap');
+  const searchBtn   = document.getElementById('jfSearchBtn');
+  const searchInput = document.getElementById('jfSearchInput');
+
+  searchBtn.addEventListener('click', () => {
+    const isOpen = searchWrap.classList.toggle('open');
+    if (isOpen) searchInput.focus();
+    else searchInput.value = '';
+  });
+  document.addEventListener('click', e => {
+    if (!searchWrap.contains(e.target)) {
+      searchWrap.classList.remove('open');
+      searchInput.value = '';
+    }
   });
 
-  target.classList.toggle('open');
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.dropdown')) {
-    document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
-  }
-});
-
-/* ── SEARCH SUGGESTIONS ──────────────────────────────────── */
-const searchInput = document.getElementById('searchInput');
-const suggestions = document.getElementById('searchSuggestions');
-
-searchInput.addEventListener('focus', () => suggestions.classList.add('active'));
-searchInput.addEventListener('blur',  () => setTimeout(() => suggestions.classList.remove('active'), 150));
-
-searchInput.addEventListener('input', () => {
-  suggestions.classList.toggle('active', searchInput.value.length === 0);
-});
-
-document.querySelectorAll('.suggestion-item').forEach(item => {
-  item.addEventListener('mousedown', () => {
-    searchInput.value = item.textContent.trim();
-    suggestions.classList.remove('active');
+  /* Search submit on Enter */
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && searchInput.value.trim()) {
+      window.location.href = 'search.php?q=' + encodeURIComponent(searchInput.value.trim());
+    }
   });
-});
 
-/* ── MOBILE DRAWER ───────────────────────────────────────── */
-function toggleMobileDrawer() {
-  const drawer = document.getElementById('mobileDrawer');
-  const burger = document.getElementById('hamburger');
-  drawer.classList.toggle('open');
-  burger.classList.toggle('active');
-}
+  /* Hamburger */
+  const hamburger  = document.getElementById('jfHamburger');
+  const mobileMenu = document.getElementById('jfMobileMenu');
 
-/* ── CART REMOVE ─────────────────────────────────────────── */
-function removeCartItem(id) {
-  const item = document.querySelector(`.cart-item[data-id="${id}"]`);
-  if (!item) return;
-  item.style.transition = 'opacity .2s, max-height .25s';
-  item.style.opacity = '0';
-  setTimeout(() => {
-    item.remove();
-    updateCartUI();
-  }, 220);
-}
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    mobileMenu.setAttribute('aria-hidden', !open);
+  });
 
-function updateCartUI() {
-  const items = document.querySelectorAll('.cart-item');
-  const count = items.length;
-  document.getElementById('cartCount').textContent = count;
-  document.getElementById('cartItemsLabel').textContent = `${count} item${count !== 1 ? 's' : ''}`;
-  document.getElementById('mobileCartBadge').textContent = count > 0 ? `(${count})` : '';
+  /* Mobile accordion */
+  document.querySelectorAll('.mob-link[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sub = document.getElementById(btn.dataset.target);
+      const isOpen = sub.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+    });
+  });
 
-  const cartItems = document.getElementById('cartItemsList');
-  if (count === 0) {
-    cartItems.innerHTML = `<div class="cart-empty"><i class="fa-solid fa-bag-shopping"></i>Your cart is empty</div>`;
-    document.getElementById('cartTotal').textContent = 'NPR 0';
-  }
-}
+  /* Cart count helper */
+  const cartCountEl = document.getElementById('jfCartCount');
+  const cartBtn     = document.getElementById('jfCartBtn');
 
-/* ── NOTIFICATIONS ───────────────────────────────────────── */
-function markAllRead() {
-  document.querySelectorAll('.notif-item.unread').forEach(n => n.classList.remove('unread'));
-  document.getElementById('notifCount').style.display = 'none';
-}
+  window.JFCart = {
+    get count () { return parseInt(cartCountEl.textContent, 10) || 0; },
+    add (n = 1) {
+      cartCountEl.textContent = this.count + n;
+      cartBtn.classList.remove('bump');
+      void cartBtn.offsetWidth;
+      cartBtn.classList.add('bump');
+      cartBtn.addEventListener('animationend', () => cartBtn.classList.remove('bump'), { once: true });
+    }
+  };
 
-/* ── LOGOUT MODAL ────────────────────────────────────────── */
-function openLogoutModal() {
-  document.getElementById('logoutModal').style.display = 'flex';
-  document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
-  const drawer = document.getElementById('mobileDrawer');
-  if (drawer.classList.contains('open')) toggleMobileDrawer();
-}
+  /* ── Logout modal helpers ─────────────────────────────────── */
+  const logoutModal = document.getElementById('jfLogoutModal');
 
-function closeLogoutModal() {
-  document.getElementById('logoutModal').style.display = 'none';
-}
+  window.jfOpenLogoutModal = function () {
+    logoutModal.style.display = 'flex';
+    setTimeout(() => {
+      const cancel = logoutModal.querySelector('.jf-logout-cancel');
+      if (cancel) cancel.focus();
+    }, 50);
+  };
 
-// Close modal on backdrop click
-document.getElementById('logoutModal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeLogoutModal();
-});
+  window.jfCloseLogoutModal = function () {
+    logoutModal.style.display = 'none';
+  };
+
+  // Close on backdrop click
+  logoutModal.addEventListener('click', function (e) {
+    if (e.target === logoutModal) jfCloseLogoutModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && logoutModal.style.display === 'flex') {
+      jfCloseLogoutModal();
+    }
+  });
+
+})();
 </script>
-
-</body>
-</html>

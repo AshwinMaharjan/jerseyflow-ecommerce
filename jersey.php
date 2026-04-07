@@ -120,7 +120,7 @@ $q       = $q_parts ? '&' . http_build_query($q_parts) : '';
     <link rel="stylesheet" href="style/jersey.css">
 </head>
 <body>
-<?php include("navbar.php"); ?>
+<?php include("homepage/navbar.php"); ?>
 
 <!-- ══════════════════ MAIN CONTENT ══════════════════ -->
 <main class="jersey-page">

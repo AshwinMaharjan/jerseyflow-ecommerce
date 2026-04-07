@@ -125,7 +125,7 @@ $page_title     = htmlspecialchars($product['product_name']);
     <link rel="stylesheet" href="style/product.css">
 </head>
 <body>
-<?php include("navbar.php"); ?>
+<?php include("homepage/navbar.php"); ?>
 
 <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 

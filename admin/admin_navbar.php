@@ -85,7 +85,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
       <span class="admin-name"><?= htmlspecialchars($admin_name) ?></span>
 
       <div class="dropdown-menu profile-menu">
-        <a href="profile.php">My Profile</a>
+        <a href="/jerseyflow-ecommerce/admin/admin_profile.php">My Profile</a>
         <a href="change_password.php">Change Password</a>
         <hr />
           <a href="#" onclick="openLogoutModal()">Logout</a>
