@@ -79,7 +79,7 @@ function isOpen(array $pages, string $current): string {
       <div class="sidebar-dropdown">
 <a href="/jerseyflow-ecommerce/users/users_profile.php" class="sidebar-dropdown-link"> Personal Information</a>
 <a href="/jerseyflow-ecommerce/users/address_book.php" class="sidebar-dropdown-link"> Address Book </a>
-<a href="/jerseyflow-ecommerce/admin/orders_management/pending.php" class="sidebar-dropdown-link"> Change Password </a>
+<a href="/jerseyflow-ecommerce/users/change_password.php" class="sidebar-dropdown-link"> Change Password </a>
     </div>
     </div>
 

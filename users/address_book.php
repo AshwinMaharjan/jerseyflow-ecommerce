@@ -148,6 +148,7 @@ if (isset($_GET['edit'])) {
     <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../style/footer.css">
     <link rel="stylesheet" href="../style/address_book.css">
+    <link rel="stylesheet" href="../style/users_menu.css">
 
 </head>
 <body>
@@ -156,6 +157,7 @@ if (isset($_GET['edit'])) {
 
 <div class="page-wrapper">
     <?php include 'users_menu.php'; ?>
+<div class="addr-page-content">
 
     <div class="page-header">
         <h1 class="page-title">My <span>Address Book</span></h1>
@@ -334,6 +336,7 @@ if (isset($_GET['edit'])) {
             </div>
         </form>
     </div>
+</div>
 </div>
 
 <!-- ── Delete Confirm Modal ── -->

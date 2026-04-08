@@ -562,4 +562,3 @@ if ($stock > 0 && $variant_id) {
 
 </body>
 </html>
-

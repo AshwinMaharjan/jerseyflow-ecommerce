@@ -74,7 +74,7 @@ if ($is_logged_in) {
         $account_url = '/jerseyflow-ecommerce/admin/admin_homepage.php';
     } else {
         $profile_url   = '/jerseyflow-ecommerce/users/users_profile.php';
-        $change_pw_url = '/jerseyflow-ecommerce/users/users_change_pw.php';
+        $change_pw_url = '/jerseyflow-ecommerce/users/change_password.php';
         $account_url = '/jerseyflow-ecommerce/users/users_homepage.php';
     }
 
@@ -190,7 +190,7 @@ if ($is_logged_in) {
 
     <!-- About -->
     <li>
-      <a href="/jerseyflow-ecommerce/about.php" class="<?= ($current_page === 'about.php') ? 'active' : '' ?>">
+      <a href="/jerseyflow-ecommerce/about_section.php" class="<?= ($current_page === 'about_section.php') ? 'active' : '' ?>">
         About
       </a>
     </li>
@@ -337,7 +337,7 @@ if ($is_logged_in) {
     <ul>
 
       <li>
-        <a href="about.php" class="mob-link">About</a>
+        <a href="about_section.php" class="mob-link">About</a>
       </li>
 
       <li>

@@ -101,7 +101,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </li>
     <!-- About -->
     <li>
-      <a href="about.php" class="<?= ($current_page === 'about.php') ? 'active' : '' ?>">
+      <a href="about_section.php" class="<?= ($current_page === 'about_section.php') ? 'active' : '' ?>">
         About
       </a>
     </li>
@@ -165,7 +165,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <ul>
 
       <li>
-        <a href="about.php" class="mob-link">About</a>
+        <a href="about_section.php" class="mob-link">About</a>
       </li>
 
       <li>
