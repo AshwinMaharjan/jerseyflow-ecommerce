@@ -1,8 +1,7 @@
 <?php 
 session_start();
 
-$conn = new mysqli("localhost", "root", "", "jerseyflow");
-
+include("connect.php");
 $email    = $_POST['email']    ?? '';
 $password = $_POST['password'] ?? '';
 

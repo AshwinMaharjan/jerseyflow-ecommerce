@@ -81,8 +81,8 @@ function isOpen(array $pages, string $current): string {
 <a href="/jerseyflow-ecommerce/admin/orders_management/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
 <a href="/jerseyflow-ecommerce/admin/orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
 <a href="/jerseyflow-ecommerce/admin/orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a>
-<a href="/jerseyflow-ecommerce/admin/orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
-<a href="/jerseyflow-ecommerce/admin/orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a>
+<!-- <a href="/jerseyflow-ecommerce/admin/orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a> -->
 <a href="/jerseyflow-ecommerce/admin/orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a>
 
       </div>
@@ -134,7 +134,7 @@ function isOpen(array $pages, string $current): string {
         <a href="/jerseyflow-ecommerce/admin/pymt/all_transaction.php" class="sidebar-dropdown-link">All Transaction</a>
         <a href="/jerseyflow-ecommerce/admin/pymt/pending_payments.php" class="sidebar-dropdown-link">Pending Payments</a>
         <a href="/jerseyflow-ecommerce/admin/pymt/failed_transactions.php" class="sidebar-dropdown-link">Failed Transactions</a>
-        <a href="/jerseyflow-ecommerce/admin/pymt/refund_requests.php" class="sidebar-dropdown-link">Refund Requests</a>
+        <!-- <a href="/jerseyflow-ecommerce/admin/pymt/refund_requests.php" class="sidebar-dropdown-link">Refund Requests</a> -->
         <a href="/jerseyflow-ecommerce/admin/pymt/reports.php" class="sidebar-dropdown-link"> Reports / Analytics</a>
 
       </div>

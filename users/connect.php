@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $servername = "localhost";
 $user = "root";       
 $pass = "";           
-$dbname = "jerseyflow";
+$dbname = "jerseyflow_new";
 
 $conn = mysqli_connect($servername, $user, $pass, $dbname);
 

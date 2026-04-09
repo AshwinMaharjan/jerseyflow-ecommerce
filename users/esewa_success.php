@@ -156,7 +156,7 @@ if (empty($error_message)) {
         $params       = array_merge([$user_id], $selected_ids);
 
         $cart_sql = "
-            SELECT c.cart_id, c.product_id, c.quantity, p.price
+            SELECT c.cart_id, c.product_id, c.variant_id, c.quantity, p.price
             FROM cart c
             JOIN products p ON c.product_id = p.product_id
             WHERE c.user_id = ?
@@ -181,27 +181,43 @@ if (empty($error_message)) {
             throw new Exception("Cart items not found. They may have already been ordered.");
         }
 
+        $method_name = 'esewa';
+
+        $stmt = $conn->prepare("SELECT method_id FROM payment_methods WHERE method_name = ? LIMIT 1");
+        $stmt->bind_param("s", $method_name);
+        $stmt->execute();
+        $stmt->bind_result($method_id);
+        $stmt->fetch();
+        $stmt->close();
+
+        if (!$method_id) {
+            throw new Exception("Payment method not found in database");
+        }
+
         /* ── 6b. Insert into orders table ── */
         $order_stmt = $conn->prepare("
             INSERT INTO orders
                 (user_id, address_id, total_amount,
-                 payment_method, payment_status,
+                 method_id, payment_status,
                  esewa_transaction_uuid, esewa_ref_id,
                  order_status, created_at)
             VALUES
                 (?, ?, ?,
-                 'esewa', 'paid',
+                 ?, 'paid',
                  ?, ?,
                  'processing', NOW())
         ");
+
         $order_stmt->bind_param(
-            'iidss',
+            'iidiss',
             $user_id,
             $address_id,
             $db_total,
+            $method_id,
             $transaction_uuid,
             $esewa_ref_id
         );
+
         $order_stmt->execute();
         $order_id = $conn->insert_id;
         $order_stmt->close();
@@ -210,7 +226,75 @@ if (empty($error_message)) {
             throw new Exception("Failed to create order record.");
         }
 
-        /* ── 6d. Remove purchased items from cart ── */
+        /* ── 6c. Insert into payments table ── */
+        $payment_stmt = $conn->prepare("
+            INSERT INTO payments
+                (order_id, amount, payment_status, gateway, transaction_id,
+                 failure_reason, paid_at, created_at)
+            VALUES
+                (?, ?, 'paid', 'esewa', ?,
+                 NULL, NOW(), NOW())
+        ");
+        $payment_stmt->bind_param(
+            'ids',
+            $order_id,
+            $db_total,
+            $transaction_uuid
+        );
+        $payment_stmt->execute();
+        $payment_stmt->close();
+
+        /* ── 6d. Insert each cart item into order_items ── */
+        $item_stmt = $conn->prepare("
+            INSERT INTO order_items
+                (order_id, product_id, variant_id, quantity, unit_price, subtotal)
+            VALUES
+                (?, ?, ?, ?, ?, ?)
+        ");
+
+        foreach ($cart_rows as $item) {
+            // variant_id may be NULL if your cart doesn't track variants
+            $variant_id = $item['variant_id'] ?? null;
+            $item_stmt->bind_param(
+                'iiiddd',
+                $order_id,
+                $item['product_id'],
+                $variant_id,
+                $item['quantity'],
+                $item['price'],
+                $item['subtotal']
+            );
+            $item_stmt->execute();
+        }
+        $item_stmt->close();
+
+        /* ── 6e. Deduct stock from products table ── */
+        $stock_stmt = $conn->prepare("
+            UPDATE products
+            SET stock = stock - ?
+            WHERE product_id = ?
+              AND stock >= ?
+        ");
+
+        foreach ($cart_rows as $item) {
+            $stock_stmt->bind_param(
+                'iii',
+                $item['quantity'],
+                $item['product_id'],
+                $item['quantity']
+            );
+            $stock_stmt->execute();
+
+            if ($stock_stmt->affected_rows === 0) {
+                throw new Exception(
+                    "Insufficient stock for product ID {$item['product_id']}. " .
+                    "Please contact support — your payment will be refunded."
+                );
+            }
+        }
+        $stock_stmt->close();
+
+        /* ── 6f. Remove purchased items from cart ── */
         $del_placeholders = implode(',', array_fill(0, count($selected_ids), '?'));
         $del_types        = 'i' . str_repeat('i', count($selected_ids));
         $del_params       = array_merge([$user_id], $selected_ids);
@@ -224,7 +308,7 @@ if (empty($error_message)) {
         $del_stmt->execute();
         $del_stmt->close();
 
-        /* ── 6e. Commit ── */
+        /* ── 6g. Commit ── */
         $conn->commit();
 
         // Clear pending order from session

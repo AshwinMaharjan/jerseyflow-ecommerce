@@ -240,7 +240,7 @@ $has_addresses = !empty($addresses);
                     <div class="empty-state small">
                         <p class="empty-title">No saved addresses</p>
                         <p class="empty-sub">
-                            Please <a href="profile.php#addresses" class="link">add a delivery address</a> to your profile.
+                            Please <a href="address_book.php" class="link">add a delivery address</a> to your profile.
                         </p>
                     </div>
 
@@ -378,14 +378,14 @@ $has_addresses = !empty($addresses);
 </button>
 <button
     type="submit"
+    formaction="/jerseyflow-ecommerce/users/cod_checkout.php"
     class="btn-cod <?= ($cart_empty || !$has_addresses) ? 'disabled' : '' ?>"
     <?= ($cart_empty || !$has_addresses) ? 'disabled' : '' ?>
     onclick="document.getElementById('payment_method').value='cod'"
 >
     <i class="fa-solid fa-truck"></i>
     Cash on Delivery
-</button>
-                        <?php if ($cart_empty): ?>
+</button>                        <?php if ($cart_empty): ?>
                             <p class="pay-hint warn">
                                 <i class="fa-solid fa-circle-exclamation"></i>
                                 No items selected. <a href="cart.php" class="link">Back to cart</a>.

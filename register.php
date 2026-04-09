@@ -203,7 +203,7 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
 
 });
 </script>
-<script>
+<?php
   include("connect.php");
 
 $full_name = $_POST['full_name'];
@@ -259,16 +259,16 @@ $hashed = password_hash($password, PASSWORD_DEFAULT);
 
 /* INSERT INTO DATABASE */
 $query = "INSERT INTO users 
-(full_name, email, password, phone, address, profile_image)
+(full_name, email, password, phone, address, profile_image, status, role)
 VALUES
-('$full_name', '$email', '$hashed', '$phone', '$address', '$profile_image')";
+('$full_name', '$email', '$hashed', '$phone', '$address', '$profile_image', 'active', 'user')";
 
 if(mysqli_query($conn, $query)){
     echo "success";
 } else {
     echo "Error occurred";
 }
-</script>
+?>
 
 </body>
 </html>

@@ -63,9 +63,9 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-<a href="/jerseyflow-ecommerce/admin/all_products.php" class="sidebar-dropdown-link"> All Orders</a>
-<a href="/jerseyflow-ecommerce/admin/add_products.php" class="sidebar-dropdown-link"> Pending</a>
-<a href="/jerseyflow-ecommerce/admin/categories.php" class="sidebar-dropdown-link"> Delivered</a>      </div>
+<a href="/jerseyflow-ecommerce/users/orders/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
+<a href="/jerseyflow-ecommerce/users/orders/pending_orders.php" class="sidebar-dropdown-link"> Pending</a>
+<a href="/jerseyflow-ecommerce/users/orders/delivered_orders.php" class="sidebar-dropdown-link"> Delivered</a>      </div>
     </div>
 
     <!-- ── 3. Orders Management ──────────────────────────────────────────── -->

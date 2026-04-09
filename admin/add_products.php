@@ -25,6 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description  = trim($_POST['description'] ?? '');
     $special_type = $_POST['special_type'] ?? null;
 
+    // ── EXPLICITLY ASSIGN $price and $stock BEFORE validation ────
+    // This fixes the scoping bug where $price/$stock were only assigned
+    // inside the elseif condition (when validation FAILED), meaning they
+    // were undefined when validation PASSED.
+    $price = is_numeric($raw_price) ? floatval($raw_price) : 0;
+    $stock = preg_match('/^\d+$/', trim($raw_stock)) ? intval($raw_stock) : -1;
 
     // ── VALIDATION ───────────────────────────────────────────────
 
@@ -32,11 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Product name is required and must be under 255 characters.';
     }
 
-    elseif (!is_numeric($raw_price) || ($price = floatval($raw_price)) < 500 || $price > 20000) {
+    elseif ($price < 500 || $price > 20000) {
         $error = 'Price must be between Rs. 500 and Rs. 20,000.';
     }
 
-    elseif (!preg_match('/^\d+$/', trim($raw_stock)) || ($stock = intval($raw_stock)) > 500) {
+    elseif ($stock < 0 || $stock > 500) {
         $error = 'Stock must be a whole number between 0 and 500.';
     }
 
@@ -44,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Select at least one: Club or Country.';
     }
 
-    // optional strict rule
     elseif ($club_id && $country_id) {
         $error = 'Select either Club OR Country, not both.';
     }
@@ -59,114 +64,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     // ── IMAGE UPLOAD ─────────────────────────────────────────────
-// ── IMAGE UPLOAD ─────────────────────────────────────────────
-$uploaded_images = []; // [ ['path' => '...', 'is_primary' => 1/0], ... ]
+    $uploaded_images = [];
 
-if (empty($error)) {
-
-    $file_count = count($_FILES['images']['name']);
-
-if ($file_count < 1) {
-    $error = 'At least one product image is required.';
-}
-elseif ($file_count > 4) {
-    $error = 'You can upload maximum 4 images only.';
-} else {
-
-        $upload_dir   = '../uploads/products/';
-        $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
-        $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
-        $max_size     = 5 * 1024 * 1024;
-
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
-        }
+    if (empty($error)) {
 
         $file_count = count($_FILES['images']['name']);
 
-        foreach ($_FILES['images']['name'] as $index => $fname) {
-            // ✅ ADD THIS HERE (first thing inside loop)
-    if ($_FILES['images']['error'][$index] !== UPLOAD_ERR_OK) {
-        $error = 'Upload error on file: ' . htmlspecialchars($fname);
-        break;
-    }
-            $file_tmp  = $_FILES['images']['tmp_name'][$index];
-            $file_size = $_FILES['images']['size'][$index];
+        if ($file_count < 1) {
+            $error = 'At least one product image is required.';
+        }
+        elseif ($file_count > 4) {
+            $error = 'You can upload maximum 4 images only.';
+        } else {
 
-            if (!is_uploaded_file($file_tmp)) {
-                $error = 'Invalid file upload on image ' . ($index + 1) . '.';
-                break;
+            $upload_dir   = '../uploads/products/';
+            $allowed_ext  = ['jpg', 'jpeg', 'png', 'webp'];
+            $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
+            $max_size     = 5 * 1024 * 1024;
+
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
             }
 
-            $file_ext = strtolower(pathinfo($fname, PATHINFO_EXTENSION));
+            foreach ($_FILES['images']['name'] as $index => $fname) {
 
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime  = finfo_file($finfo, $file_tmp);
-            finfo_close($finfo);
+                if ($_FILES['images']['error'][$index] !== UPLOAD_ERR_OK) {
+                    $error = 'Upload error on file: ' . htmlspecialchars($fname);
+                    break;
+                }
 
-            if (!in_array($file_ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
-                $error = 'Invalid image format for file: ' . htmlspecialchars($fname);
-                break;
+                $file_tmp  = $_FILES['images']['tmp_name'][$index];
+                $file_size = $_FILES['images']['size'][$index];
+
+                if (!is_uploaded_file($file_tmp)) {
+                    $error = 'Invalid file upload on image ' . ($index + 1) . '.';
+                    break;
+                }
+
+                $file_ext = strtolower(pathinfo($fname, PATHINFO_EXTENSION));
+
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime  = finfo_file($finfo, $file_tmp);
+                finfo_close($finfo);
+
+                if (!in_array($file_ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
+                    $error = 'Invalid image format for file: ' . htmlspecialchars($fname);
+                    break;
+                }
+
+                if ($file_size > $max_size) {
+                    $error = 'Image "' . htmlspecialchars($fname) . '" exceeds 5MB limit.';
+                    break;
+                }
+
+                $new_filename = uniqid('product_', true) . '.' . $file_ext;
+                $dest = $upload_dir . $new_filename;
+
+                if (!move_uploaded_file($file_tmp, $dest)) {
+                    $error = 'Upload failed for: ' . htmlspecialchars($fname);
+                    break;
+                }
+
+                $uploaded_images[] = [
+                    'path'       => $new_filename,
+                    'is_primary' => ($index === 0) ? 1 : 0
+                ];
             }
-
-            if ($file_size > $max_size) {
-                $error = 'Image "' . htmlspecialchars($fname) . '" exceeds 2MB limit.';
-                break;
-            }
-
-            $new_filename = uniqid('product_', true) . '.' . $file_ext;
-            $dest = $upload_dir . $new_filename;
-
-            if (!move_uploaded_file($file_tmp, $dest)) {
-                $error = 'Upload failed for: ' . htmlspecialchars($fname);
-                break;
-            }
-
-            $uploaded_images[] = [
-                'path'       => $new_filename,
-                'is_primary' => ($index === 0) ? 1 : 0  // first = primary
-            ];
         }
     }
-}
 
-// ── INSERT PRODUCT ───────────────────────────────────────────
+    // ── INSERT PRODUCT ───────────────────────────────────────────
     if (empty($error)) {
 
         $club_id_val    = $club_id ?: null;
         $country_id_val = $country_id ?: null;
 
-// NEW
-$stmt = mysqli_prepare($conn,
-    "INSERT INTO products
-    (product_name, price, stock, club_id, country_id, size_id, kit_id, special_type, description, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
-);
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO products
+            (product_name, price, stock, club_id, country_id, size_id, kit_id, special_type, description, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        );
 
-mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
-    $product_name,
-    $price,
-    $stock,
-    $club_id_val,
-    $country_id_val,
-    $size_id,
-    $kit_id,
-    $special_type,
-    $description
-);
+        mysqli_stmt_bind_param($stmt, 'sdiiiiiss',
+            $product_name,
+            $price,
+            $stock,
+            $club_id_val,
+            $country_id_val,
+            $size_id,
+            $kit_id,
+            $special_type,
+            $description
+        );
+
         if (mysqli_stmt_execute($stmt)) {
 
-            // ✅ GET PRODUCT ID (FIXED)
             $new_product_id = mysqli_insert_id($conn);
-// ── INSERT INTO product_images ────────────────────────────
-$img_stmt = $conn->prepare(
-    "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, ?)"
-);
-foreach ($uploaded_images as $img) {
-    $img_stmt->bind_param('isi', $new_product_id, $img['path'], $img['is_primary']);
-    $img_stmt->execute();
-}
-$img_stmt->close();
+
+            // ── INSERT INTO product_images ────────────────────────
+            $img_stmt = $conn->prepare(
+                "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, ?)"
+            );
+            foreach ($uploaded_images as $img) {
+                $img_stmt->bind_param('isi', $new_product_id, $img['path'], $img['is_primary']);
+                $img_stmt->execute();
+            }
+            $img_stmt->close();
 
             // ── GET SIZE LABEL ────────────────────────────────────
             $size_label = 'M';
@@ -177,37 +180,50 @@ $img_stmt->close();
             if ($res) $size_label = $res['size_name'];
             $sr->close();
 
-            // ── GENERATE SKU ─────────────────────────────────────
+            // ── GENERATE SKU ──────────────────────────────────────
             $sku = 'JF-' . str_pad($new_product_id, 5, '0', STR_PAD_LEFT) . '-' . strtoupper($size_label) . '-DEF';
 
-// ── CREATE VARIANT ───────────────────────────────────────────
-$vstmt = $conn->prepare("
-    INSERT INTO product_variants (product_id, size, color, sku, stock, reorder_level, reorder_qty)
-    VALUES (?, ?, 'Default', ?, 0, 5, 20)
-");
+            // ── CREATE VARIANT (price NOW correctly stored) ───────
+            $vstmt = $conn->prepare("
+                INSERT INTO product_variants
+                    (product_id, size, color, sku, stock, reorder_level, reorder_qty, price)
+                VALUES (?, ?, 'Default', ?, ?, 5, 20, ?)
+            ");
 
-$vstmt->bind_param('iss', $new_product_id, $size_label, $sku);
-$vstmt->execute();
+            // $price is guaranteed to be set correctly here
+            $vstmt->bind_param(
+                'issid',
+                $new_product_id,
+                $size_label,
+                $sku,
+                $stock,
+                $price          // ← now always the validated floatval from $raw_price
+            );
 
-$variant_id = $conn->insert_id;
-$vstmt->close();
+            if (!$vstmt->execute()) {
+                die("Variant insert failed: " . $vstmt->error);
+            }
 
-// ── STOCK MOVEMENT ───────────────────────────────────────────
-if ($stock > 0 && $variant_id) {
-    require_once 'ims/ims_helpers.php';
-    $admin_id = $_SESSION['admin_id'] ?? 0;
+            $variant_id = $conn->insert_id;
+            $vstmt->close();
 
-    ims_stock_move(
-        $conn,
-        $variant_id,
-        $admin_id,
-        'IN',
-        $stock,
-        '',
-        'Initial stock on product creation',
-        ''
-    );
-}
+            // ── STOCK MOVEMENT ────────────────────────────────────
+            if ($stock > 0 && $variant_id) {
+                require_once 'ims/ims_helpers.php';
+                $admin_id = $_SESSION['admin_id'] ?? 0;
+
+                ims_stock_move(
+                    $conn,
+                    $variant_id,
+                    $admin_id,
+                    'IN',
+                    $stock,
+                    '',
+                    'Initial stock on product creation',
+                    ''
+                );
+            }
+
             $success = 'Product <strong>' . htmlspecialchars($product_name) . '</strong> added successfully!';
             $_POST = [];
 
@@ -321,9 +337,9 @@ if ($stock > 0 && $variant_id) {
                                 <span class="field-error" id="stock-error"></span>
                             </div>
 
-                        </div><!-- /form-row-2 price-stock -->
+                        </div>
 
-                        <!-- Club & Country (at least one required) -->
+                        <!-- Club & Country -->
                         <div class="form-row-2">
 
                             <div class="form-group">
@@ -331,22 +347,21 @@ if ($stock > 0 && $variant_id) {
                                     Club
                                     <span class="field-hint">(or select a country)</span>
                                 </label>
-                                    <div class="select-wrapper">
-
-                                <select id="club_id" name="club_id">
-                                    <option value="">-- Select Club --</option>
-                                    <?php
-                                    mysqli_data_seek($clubs_result, 0);
-                                    while ($club = mysqli_fetch_assoc($clubs_result)):
-                                        $sel = (isset($_POST['club_id']) && $_POST['club_id'] == $club['club_id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $club['club_id'] ?>" <?= $sel ?>>
-                                            <?= htmlspecialchars($club['club_name']) ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-icon"></i>
-                            </div>
+                                <div class="select-wrapper">
+                                    <select id="club_id" name="club_id">
+                                        <option value="">-- Select Club --</option>
+                                        <?php
+                                        mysqli_data_seek($clubs_result, 0);
+                                        while ($club = mysqli_fetch_assoc($clubs_result)):
+                                            $sel = (isset($_POST['club_id']) && $_POST['club_id'] == $club['club_id']) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $club['club_id'] ?>" <?= $sel ?>>
+                                                <?= htmlspecialchars($club['club_name']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-icon"></i>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -354,27 +369,25 @@ if ($stock > 0 && $variant_id) {
                                     Country
                                     <span class="field-hint">(or select a club)</span>
                                 </label>
-                                                                    <div class="select-wrapper">
-
-                                <select id="country_id" name="country_id">
-                                    <option value="">-- Select Country --</option>
-                                    <?php
-                                    mysqli_data_seek($countries_result, 0);
-                                    while ($country = mysqli_fetch_assoc($countries_result)):
-                                        $sel = (isset($_POST['country_id']) && $_POST['country_id'] == $country['country_id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $country['country_id'] ?>" <?= $sel ?>>
-                                            <?= htmlspecialchars($country['country_name']) ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-icon"></i>
-                                <!-- Error shown below country (right cell) -->
-                                <span class="field-error" id="club-country-error"></span>
-                            </div>
+                                <div class="select-wrapper">
+                                    <select id="country_id" name="country_id">
+                                        <option value="">-- Select Country --</option>
+                                        <?php
+                                        mysqli_data_seek($countries_result, 0);
+                                        while ($country = mysqli_fetch_assoc($countries_result)):
+                                            $sel = (isset($_POST['country_id']) && $_POST['country_id'] == $country['country_id']) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $country['country_id'] ?>" <?= $sel ?>>
+                                                <?= htmlspecialchars($country['country_name']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-icon"></i>
+                                    <span class="field-error" id="club-country-error"></span>
+                                </div>
                             </div>
 
-                        </div><!-- /form-row-2 club-country -->
+                        </div>
 
                         <!-- Size & Kit -->
                         <div class="form-row-2">
@@ -383,83 +396,80 @@ if ($stock > 0 && $variant_id) {
                                 <label for="size_id">
                                     Size <span class="required">*</span>
                                 </label>
-                                                                    <div class="select-wrapper">
-
-                                <select id="size_id" name="size_id" required>
-                                    <option value="">-- Select Size --</option>
-                                    <?php
-                                    mysqli_data_seek($sizes_result, 0);
-                                    while ($size = mysqli_fetch_assoc($sizes_result)):
-                                        $sel = (isset($_POST['size_id']) && $_POST['size_id'] == $size['size_id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $size['size_id'] ?>" <?= $sel ?>>
-                                            <?= htmlspecialchars($size['size_name']) ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-icon"></i>
-                            </div>
+                                <div class="select-wrapper">
+                                    <select id="size_id" name="size_id" required>
+                                        <option value="">-- Select Size --</option>
+                                        <?php
+                                        mysqli_data_seek($sizes_result, 0);
+                                        while ($size = mysqli_fetch_assoc($sizes_result)):
+                                            $sel = (isset($_POST['size_id']) && $_POST['size_id'] == $size['size_id']) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $size['size_id'] ?>" <?= $sel ?>>
+                                                <?= htmlspecialchars($size['size_name']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-icon"></i>
+                                </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="kit_id">
                                     Kit <span class="required">*</span>
                                 </label>
-                                                                    <div class="select-wrapper">
+                                <div class="select-wrapper">
+                                    <select id="kit_id" name="kit_id" required>
+                                        <option value="">-- Select Kit --</option>
+                                        <?php
+                                        mysqli_data_seek($kits_result, 0);
+                                        while ($kit = mysqli_fetch_assoc($kits_result)):
+                                            $sel = (isset($_POST['kit_id']) && $_POST['kit_id'] == $kit['kit_id']) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $kit['kit_id'] ?>" <?= $sel ?>>
+                                                <?= htmlspecialchars($kit['kit_name']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-icon"></i>
+                                </div>
+                            </div>
 
-                                <select id="kit_id" name="kit_id" required>
-                                    <option value="">-- Select Kit --</option>
-                                    <?php
-                                    mysqli_data_seek($kits_result, 0);
-                                    while ($kit = mysqli_fetch_assoc($kits_result)):
-                                        $sel = (isset($_POST['kit_id']) && $_POST['kit_id'] == $kit['kit_id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $kit['kit_id'] ?>" <?= $sel ?>>
-                                            <?= htmlspecialchars($kit['kit_name']) ?>
-                                        </option>
-                                    <?php endwhile; ?>
+                        </div>
+
+                        <!-- Special Category -->
+                        <div class="form-group">
+                            <label for="special_type">
+                                Special Category
+                                <span class="field-hint">(optional)</span>
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="special_type" name="special_type">
+                                    <option value="">-- None --</option>
+                                    <option value="standard"
+                                        <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'standard') ? 'selected' : '' ?>>
+                                        Standard Jersey
+                                    </option>
+                                    <option value="player_edition"
+                                        <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'player_edition') ? 'selected' : '' ?>>
+                                        Player Edition Jersey
+                                    </option>
+                                    <option value="limited"
+                                        <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'limited') ? 'selected' : '' ?>>
+                                        Limited Jersey
+                                    </option>
+                                    <option value="retro"
+                                        <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'retro') ? 'selected' : '' ?>>
+                                        Retro Jersey
+                                    </option>
+                                    <option value="worldcup_2026"
+                                        <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'worldcup_2026') ? 'selected' : '' ?>>
+                                        World Cup 2026 Jersey
+                                    </option>
                                 </select>
                                 <i class="fa-solid fa-chevron-down select-icon"></i>
                             </div>
-                            </div>
+                        </div>
 
-                        </div><!-- /form-row-2 size-kit -->
-<div class="form-group">
-    <label for="special_type">
-        Special Category
-        <span class="field-hint">(optional)</span>
-    </label>
-
-<div class="select-wrapper">
-    <select id="special_type" name="special_type">
-        <option value="">-- None --</option>
-
-        <option value="standard"
-            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'standard') ? 'selected' : '' ?>>
-            Standard Jersey
-        </option>
-        <option value="player_edition"
-            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'player_edition') ? 'selected' : '' ?>>
-            Player Edition Jersey
-        </option>
-        <option value="limited"
-            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'limited') ? 'selected' : '' ?>>
-            Limited Jersey
-        </option>
-        <option value="retro"
-            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'retro') ? 'selected' : '' ?>>
-            Retro Jersey
-        </option>
-
-        <option value="worldcup_2026"
-            <?= (isset($_POST['special_type']) && $_POST['special_type'] === 'worldcup_2026') ? 'selected' : '' ?>>
-            World Cup 2026 Jersey
-        </option>
-    </select>
-
-    <i class="fa-solid fa-chevron-down select-icon"></i>
-</div>
-</div>
                         <!-- Description -->
                         <div class="form-group">
                             <label for="description">Description</label>
@@ -475,11 +485,10 @@ if ($stock > 0 && $variant_id) {
 
                         <div class="form-section-title">Product Image</div>
 
-                        <!-- Image Upload -->
                         <div class="form-group">
                             <label>
                                 Upload Image
-                                <span class="field-hint">(JPG, PNG, WEBP · max 2 MB each · first image = primary)</span>
+                                <span class="field-hint">(JPG, PNG, WEBP · max 5 MB each · first image = primary)</span>
                             </label>
                             <div class="image-upload-box" id="imageUploadBox">
                                 <img id="imagePreview" src="" alt="Preview"
@@ -489,12 +498,11 @@ if ($stock > 0 && $variant_id) {
                                     <p>Click or drag &amp; drop to upload</p>
                                     <span>Recommended: 800×800 px</span>
                                 </div>
-                                <!-- NEW -->
-<input type="file" id="images" name="images[]"
-       accept=".jpg,.jpeg,.png,.webp"
-       class="image-file-input"
-       multiple
-       required>
+                                <input type="file" id="images" name="images[]"
+                                       accept=".jpg,.jpeg,.png,.webp"
+                                       class="image-file-input"
+                                       multiple
+                                       required>
                             </div>
                             <button type="button" class="btn-remove-image hidden" id="removeImage">
                                 <i class="fa-solid fa-xmark"></i> Remove Image

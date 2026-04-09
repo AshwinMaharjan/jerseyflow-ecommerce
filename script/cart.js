@@ -21,7 +21,6 @@
     const noSelectionMsg    = document.getElementById('noSelectionMsg');
 
     // ── Confirmation Modal ────────────────────────────────────
-    // Inject modal HTML once into the page
     const modalHTML = `
         <div class="jf-modal-overlay" id="jfModalOverlay">
             <div class="jf-modal">
@@ -91,7 +90,7 @@
     // ── Recalculate subtotal from selected + checked items ────
     function recalcSummary() {
         const checkboxes = getCheckboxes();
-        let total        = 0;
+        let total         = 0;
         let selectedCount = 0;
 
         checkboxes.forEach(cb => {
@@ -99,8 +98,8 @@
             const itemEl  = document.getElementById(`cartItem-${cartId}`);
             if (!itemEl) return;
 
-            const qty     = parseInt(document.getElementById(`qty-${cartId}`)?.textContent ?? '1', 10);
-            const price   = parseFloat(itemEl.dataset.price ?? '0');
+            const qty       = parseInt(document.getElementById(`qty-${cartId}`)?.textContent ?? '1', 10);
+            const price     = parseFloat(itemEl.dataset.price ?? '0');
             const lineTotal = price * qty;
 
             if (cb.checked) {
@@ -171,26 +170,28 @@
     }
 
     // ── AJAX helper ───────────────────────────────────────────
-    // Uses an absolute path from the site root so it works regardless
-    // of which subdirectory the current page is served from.
-    const API_BASE = '/jerseyflow-ecommerce/api';
+    // Single endpoint: cart_actions.php, form-encoded POST with an `action` param.
+    // const API_BASE = '/jerseyflow-ecommerce/api';
+     const API_BASE = '../users';
 
-    async function apiPost(endpoint, data) {
-        const res = await fetch(`${API_BASE}/${endpoint}`, {
+    async function apiPost(action, data) {
+        // cart_actions.php reads from $_POST, so we must send form-encoded data.
+        const body = new URLSearchParams({ action, ...data });
+
+        const res = await fetch(`${API_BASE}/cart_actions.php`, {
             method:  'POST',
             headers: {
-                'Content-Type':     'application/json',
+                'Content-Type':     'application/x-www-form-urlencoded',
                 'X-Requested-With': 'XMLHttpRequest',
             },
-            body: JSON.stringify(data),
+            body: body.toString(),
         });
 
         const text = await res.text();
         try {
             return JSON.parse(text);
         } catch {
-            // Server returned non-JSON (e.g. a PHP error/HTML page)
-            console.error(`Non-JSON response from ${endpoint}:`, text);
+            console.error('Non-JSON response from cart_actions.php:', text);
             return { success: false, message: 'Server error. Check console for details.' };
         }
     }
@@ -210,9 +211,10 @@
         if (newQty > stock) { showToast('Not enough stock available.', 'error'); return; }
 
         try {
-            const res = await apiPost('cart_update.php', { cart_id: cartId, quantity: newQty });
+            // cart_actions.php expects `cart_id` and `qty` (not `quantity`)
+            const res = await apiPost('update', { cart_id: cartId, qty: newQty });
             if (res.success) {
-                qtyEl.textContent = newQty;
+                qtyEl.textContent       = newQty;
                 itemEl.dataset.quantity = newQty;
 
                 const price  = parseFloat(itemEl.dataset.price ?? '0');
@@ -235,7 +237,7 @@
         if (!itemEl) return;
 
         try {
-            const res = await apiPost('cart_remove.php', { cart_id: cartId });
+            const res = await apiPost('remove', { cart_id: cartId });
             if (res.success) {
                 itemEl.classList.add('removing');
                 itemEl.addEventListener('transitionend', () => {
@@ -263,7 +265,7 @@
             if (!confirmed) return;
 
             try {
-                const res = await apiPost('cart_clear.php', {});
+                const res = await apiPost('clear', {});
                 if (res.success) {
                     window.location.reload();
                 } else {
