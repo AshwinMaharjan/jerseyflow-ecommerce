@@ -2,22 +2,14 @@
 session_start();
 require_once 'connect.php';
 
-// ── Validate product ID ───────────────────────────────────────
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if ($product_id <= 0) {
-    header('Location: jersey.php');
-    exit;
-}
+if ($product_id <= 0) { header('Location: jersey.php'); exit; }
 
-// ── Fetch product ─────────────────────────────────────────────
 $stmt = $conn->prepare(
     "SELECT
         p.product_id, p.product_name, p.price, p.stock,
         p.description, p.special_type, p.created_at,
-        cl.club_name,
-        co.country_name,
-        k.kit_name,
-        s.size_name,
+        cl.club_name, co.country_name, k.kit_name,
         (SELECT pi.image_path FROM product_images pi
          WHERE pi.product_id = p.product_id AND pi.is_primary = 1
          LIMIT 1) AS primary_image
@@ -25,7 +17,6 @@ $stmt = $conn->prepare(
      LEFT JOIN clubs     cl ON p.club_id    = cl.club_id
      LEFT JOIN countries co ON p.country_id = co.country_id
      LEFT JOIN kits      k  ON p.kit_id     = k.kit_id
-     LEFT JOIN sizes     s  ON p.size_id    = s.size_id
      WHERE p.product_id = ?
      LIMIT 1"
 );
@@ -33,65 +24,59 @@ $stmt->bind_param('i', $product_id);
 $stmt->execute();
 $product = $stmt->get_result()->fetch_assoc();
 $stmt->close();
+if (!$product) { header('Location: jersey.php'); exit; }
 
-if (!$product) {
-    header('Location: jersey.php');
-    exit;
-}
-
-// ── Fetch all gallery images ──────────────────────────────────
 $img_stmt = $conn->prepare(
-    "SELECT image_path, is_primary
-     FROM product_images
-     WHERE product_id = ?
-     ORDER BY is_primary DESC, created_at ASC"
+    "SELECT image_path, is_primary FROM product_images
+     WHERE product_id = ? ORDER BY is_primary DESC, created_at ASC"
 );
 $img_stmt->bind_param('i', $product_id);
 $img_stmt->execute();
 $all_images = $img_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $img_stmt->close();
-
-// Fallback: use primary_image if no product_images rows
 if (empty($all_images) && !empty($product['primary_image'])) {
     $all_images = [['image_path' => $product['primary_image'], 'is_primary' => 1]];
 }
 
-// ── Available sizes for this product ─────────────────────────
-// The product has one size_id → one size from the sizes table.
-// We mark which standard sizes are available vs unavailable.
-$all_sizes     = ['S', 'M', 'L', 'XL', '2XL'];
+// ── Fetch variants from product_variants ──────────────────────
+$all_sizes = ['S', 'M', 'L', 'XL', '2XL'];
 
-// Normalize the size stored in DB to match our button labels
-$size_map = [
-    'small'        => 'S',  's'   => 'S',
-    'medium'       => 'M',  'm'   => 'M',
-    'large'        => 'L',  'l'   => 'L',
-    'extra large'  => 'XL', 'xl'  => 'XL', 'x-large' => 'XL',
-    'double xl'    => '2XL','2xl' => '2XL','xxl'      => '2XL', 'xx-large' => '2XL',
-];
+$var_stmt = $conn->prepare(
+    "SELECT variant_id, size, color, stock, price
+     FROM product_variants
+     WHERE product_id = ? AND is_active = 1
+     ORDER BY FIELD(size,'S','M','L','XL','2XL')"
+);
+$var_stmt->bind_param('i', $product_id);
+$var_stmt->execute();
+$variants_rows = $var_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$var_stmt->close();
 
-$raw_size       = strtolower(trim($product['size_name'] ?? ''));
-$available_size = $size_map[$raw_size] ?? strtoupper($raw_size); // fallback: uppercase as-is
+// Map: uppercase size => variant data (first active variant per size)
+$variants_by_size = [];
+foreach ($variants_rows as $v) {
+    $sz = strtoupper(trim($v['size']));
+    if (!isset($variants_by_size[$sz])) {
+        $variants_by_size[$sz] = $v;
+    }
+}
 
-// Pass available size to JS as JSON
-$available_sizes_json = json_encode([$available_size]);
+$variants_json = json_encode($variants_by_size);
 
-// ── Related products — same special_type, LIMIT 4 ────────────
+// Related products
 $related = [];
 if (!empty($product['special_type'])) {
     $rel_stmt = $conn->prepare(
-        "SELECT
-            p.product_id, p.product_name, p.price, p.image,
-            cl.club_name, co.country_name,
-            (SELECT pi.image_path FROM product_images pi
-             WHERE pi.product_id = p.product_id AND pi.is_primary = 1
-             LIMIT 1) AS primary_image
+        "SELECT p.product_id, p.product_name, p.price, p.image,
+                cl.club_name, co.country_name,
+                (SELECT pi.image_path FROM product_images pi
+                 WHERE pi.product_id = p.product_id AND pi.is_primary = 1
+                 LIMIT 1) AS primary_image
          FROM products p
          LEFT JOIN clubs     cl ON p.club_id    = cl.club_id
          LEFT JOIN countries co ON p.country_id = co.country_id
          WHERE p.special_type = ? AND p.product_id != ?
-         ORDER BY p.created_at DESC
-         LIMIT 4"
+         ORDER BY p.created_at DESC LIMIT 4"
     );
     $rel_stmt->bind_param('si', $product['special_type'], $product_id);
     $rel_stmt->execute();
@@ -99,7 +84,6 @@ if (!empty($product['special_type'])) {
     $rel_stmt->close();
 }
 
-// ── Type labels ───────────────────────────────────────────────
 $type_labels = [
     'standard'       => 'Standard',
     'player_edition' => 'Player Edition',
@@ -107,7 +91,6 @@ $type_labels = [
     'worldcup_2026'  => 'World Cup 2026',
     'retro'          => 'Retro',
 ];
-
 $category_label = $type_labels[$product['special_type']] ?? ucfirst($product['special_type'] ?? 'Jersey');
 $is_logged_in   = isset($_SESSION['user_id']);
 $page_title     = htmlspecialchars($product['product_name']);
@@ -131,7 +114,6 @@ $page_title     = htmlspecialchars($product['product_name']);
 
 <main class="product-page">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="index.php"><i class="fa-solid fa-house"></i></a>
         <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
@@ -146,41 +128,32 @@ $page_title     = htmlspecialchars($product['product_name']);
         <span class="bc-current"><?= htmlspecialchars($product['product_name']) ?></span>
     </nav>
 
-    <!-- ── Product layout ────────────────────────────────────── -->
     <div class="product-layout">
 
-        <!-- ════ LEFT: Gallery ════ -->
+        <!-- Gallery -->
         <div class="gallery-col">
             <div class="gallery-main">
                 <?php if (!empty($all_images)): ?>
-                    <img
-                        src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($all_images[0]['image_path']) ?>"
-                        alt="<?= $page_title ?>"
-                        id="mainImg"
-                        class="main-img"
-                    />
+                    <img src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($all_images[0]['image_path']) ?>"
+                         alt="<?= $page_title ?>" id="mainImg" class="main-img"/>
                 <?php else: ?>
                     <div class="main-img-placeholder"><i class="fa-solid fa-shirt"></i></div>
                 <?php endif; ?>
             </div>
-
             <?php if (count($all_images) > 1): ?>
                 <div class="gallery-thumbs">
                     <?php foreach ($all_images as $i => $img): ?>
                         <div class="thumb <?= $i === 0 ? 'active' : '' ?>"
                              data-src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($img['image_path']) ?>">
-                            <img
-                                src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($img['image_path']) ?>"
-                                alt="View <?= $i + 1 ?>"
-                                loading="lazy"
-                            />
+                            <img src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($img['image_path']) ?>"
+                                 alt="View <?= $i + 1 ?>" loading="lazy"/>
                         </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
 
-        <!-- ════ RIGHT: Details ════ -->
+        <!-- Details -->
         <div class="detail-col">
 
             <h1 class="product-title"><?= htmlspecialchars($product['product_name']) ?></h1>
@@ -198,7 +171,6 @@ $page_title     = htmlspecialchars($product['product_name']);
                 <?php endif; ?>
             </p>
 
-            <!-- Price -->
             <div class="price-row">
                 <span class="price-main" id="displayPrice">
                     Rs. <?= number_format((float)$product['price'], 2) ?>
@@ -210,29 +182,23 @@ $page_title     = htmlspecialchars($product['product_name']);
                 <?php endif; ?>
             </div>
 
-            <!-- Size buttons -->
+            <!-- Size buttons — availability driven by JS from VARIANTS_BY_SIZE -->
             <div class="option-group">
                 <label class="option-label">Size</label>
                 <div class="size-btns" id="sizeBtns">
                     <?php foreach ($all_sizes as $sz): ?>
-                        <?php $unavailable = ($sz !== $available_size); ?>
-                        <button
-                            type="button"
-                            class="size-btn <?= $unavailable ? 'unavailable' : '' ?>"
-                            data-size="<?= $sz ?>"
-                            data-available="<?= $unavailable ? '0' : '1' ?>"
-                            <?= $unavailable ? 'title="Not available in this size"' : '' ?>
-                        >
+                        <button type="button"
+                                class="size-btn unavailable"
+                                data-size="<?= $sz ?>"
+                                data-available="0"
+                                title="Not available in this size">
                             <?= $sz ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
-                <span class="size-error" id="sizeError" style="display:none;">
-                    Please select a size.
-                </span>
+                <span class="size-error" id="sizeError" style="display:none;">Please select a size.</span>
             </div>
 
-            <!-- Price detail box -->
             <div class="price-detail-box">
                 <div class="price-detail-header">Price Detail</div>
                 <div class="price-detail-row">
@@ -245,7 +211,6 @@ $page_title     = htmlspecialchars($product['product_name']);
                 </div>
             </div>
 
-            <!-- Qty + Cart -->
             <div class="action-row">
                 <div class="qty-wrap">
                     <label class="option-label" for="qtySelect">Qty</label>
@@ -256,28 +221,22 @@ $page_title     = htmlspecialchars($product['product_name']);
                     </select>
                 </div>
 
-                <button
-                    type="button"
-                    class="btn-cart"
-                    id="addToCartBtn"
-                    data-id="<?= $product_id ?>"
-                    data-price="<?= (float)$product['price'] ?>"
-                    data-name="<?= htmlspecialchars(addslashes($product['product_name'])) ?>"
-                    data-logged-in="<?= $is_logged_in ? '1' : '0' ?>"
-                >
+                <button type="button" class="btn-cart" id="addToCartBtn"
+                        data-id="<?= $product_id ?>"
+                        data-price="<?= (float)$product['price'] ?>"
+                        data-name="<?= htmlspecialchars(addslashes($product['product_name'])) ?>"
+                        data-logged-in="<?= $is_logged_in ? '1' : '0' ?>">
                     <i class="fa-solid fa-cart-shopping"></i>
                     Add to Cart
                 </button>
             </div>
 
-            <!-- Info tabs -->
             <div class="info-tabs">
                 <div class="tab-nav">
                     <button class="tab-btn active" data-tab="description">Description</button>
                     <button class="tab-btn" data-tab="delivery">Delivery Time</button>
                     <button class="tab-btn" data-tab="fitcare">Fit &amp; Care</button>
                 </div>
-
                 <div class="tab-content active" id="tab-description">
                     <?php if (!empty($product['description'])): ?>
                         <p><?= nl2br(htmlspecialchars($product['description'])) ?></p>
@@ -285,14 +244,12 @@ $page_title     = htmlspecialchars($product['product_name']);
                         <p class="tab-empty">No description available for this product.</p>
                     <?php endif; ?>
                 </div>
-
                 <div class="tab-content" id="tab-delivery">
                     <ul class="info-list">
                         <li><i class="fa-solid fa-location-dot"></i><div><strong>Inside Valley</strong> — Orders are usually delivered next day of confirmation.</div></li>
                         <li><i class="fa-solid fa-truck"></i><div><strong>Outside Valley</strong> — Delivered in 1–4 working days after confirmation.</div></li>
                     </ul>
                 </div>
-
                 <div class="tab-content" id="tab-fitcare">
                     <ul class="info-list">
                         <li><i class="fa-solid fa-rotate-left"></i><div>Wash garment inside out</div></li>
@@ -306,10 +263,9 @@ $page_title     = htmlspecialchars($product['product_name']);
                 </div>
             </div>
 
-        </div><!-- /.detail-col -->
-    </div><!-- /.product-layout -->
+        </div>
+    </div>
 
-    <!-- ══ Related Products ════════════════════════════════════ -->
     <?php if (!empty($related)): ?>
         <section class="related-section">
             <h2 class="related-title">Related Products</h2>
@@ -322,12 +278,9 @@ $page_title     = htmlspecialchars($product['product_name']);
                     <a href="product.php?id=<?= (int)$r['product_id'] ?>" class="related-card">
                         <div class="related-img">
                             <?php if (!empty($r_img)): ?>
-                                <img
-                                    src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($r_img) ?>"
-                                    alt="<?= htmlspecialchars($r['product_name']) ?>"
-                                    loading="lazy"
-                                    onerror="this.parentElement.innerHTML='<div class=\'no-img\'><i class=\'fa-solid fa-shirt\'></i></div>'"
-                                />
+                                <img src="/jerseyflow-ecommerce/uploads/products/<?= htmlspecialchars($r_img) ?>"
+                                     alt="<?= htmlspecialchars($r['product_name']) ?>" loading="lazy"
+                                     onerror="this.parentElement.innerHTML='<div class=\'no-img\'><i class=\'fa-solid fa-shirt\'></i></div>'"/>
                             <?php else: ?>
                                 <div class="no-img"><i class="fa-solid fa-shirt"></i></div>
                             <?php endif; ?>
@@ -351,7 +304,7 @@ $page_title     = htmlspecialchars($product['product_name']);
 
 <script>
     const BASE_PRICE      = <?= (float)$product['price'] ?>;
-    const AVAILABLE_SIZES = <?= $available_sizes_json ?>;
+    const VARIANTS_BY_SIZE = <?= $variants_json ?>; // { "M": { variant_id, size, stock, price }, ... }
 </script>
 <script src="script/product.js"></script>
 </body>

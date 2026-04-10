@@ -79,11 +79,11 @@ function isOpen(array $pages, string $current): string {
       </button>
       <div class="sidebar-dropdown">
 <a href="/jerseyflow-ecommerce/admin/orders_management/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
-<a href="/jerseyflow-ecommerce/admin/orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
-<a href="/jerseyflow-ecommerce/admin/orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a>
+<!-- <a href="/jerseyflow-ecommerce/admin/orders_management/pending.php" class="sidebar-dropdown-link"> Pending </a>
+<a href="/jerseyflow-ecommerce/admin/orders_management/delivered.php" class="sidebar-dropdown-link"> Delivered</a> -->
 <!-- <a href="/jerseyflow-ecommerce/admin/orders_management/cancelled.php" class="sidebar-dropdown-link"> Cancelled </a>
 <a href="/jerseyflow-ecommerce/admin/orders_management/returned.php" class="sidebar-dropdown-link"> Returned </a> -->
-<a href="/jerseyflow-ecommerce/admin/orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a>
+<!-- <a href="/jerseyflow-ecommerce/admin/orders_management/high_value_orders.php" class="sidebar-dropdown-link"> High Value Orders</a> -->
 
       </div>
     </div>

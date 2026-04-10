@@ -100,7 +100,7 @@ if (empty($error_message)) {
                  order_status, created_at)
             VALUES
                 (?, ?, ?,
-                 ?, 'pending',
+                 ?, 'unpaid',
                  'pending', NOW())
         ");
 

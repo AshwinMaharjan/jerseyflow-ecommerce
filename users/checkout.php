@@ -52,13 +52,14 @@ $cart_sql = "
         c.cart_id,
         c.quantity,
         c.size,
+        c.variant_id,                          -- ← ADD THIS
         p.product_id,
         p.product_name,
-        p.price,
+        COALESCE(pv.price, p.price) AS price,  -- ← use variant price if set
         pi.image_path
     FROM cart c
-    JOIN products p
-        ON c.product_id = p.product_id
+    JOIN products p ON c.product_id = p.product_id
+    LEFT JOIN product_variants pv ON pv.variant_id = c.variant_id  -- ← ADD THIS JOIN
     LEFT JOIN product_images pi
         ON pi.product_id = p.product_id
         AND pi.is_primary = 1
@@ -66,7 +67,6 @@ $cart_sql = "
       AND c.cart_id IN ($placeholders)
     ORDER BY c.created_at DESC
 ";
-
 $stmt = $conn->prepare($cart_sql);
 $params = array_merge([$user_id], $selected_ids);
 $stmt->bind_param($types, ...$params);
