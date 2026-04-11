@@ -69,16 +69,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
       </div>
     </div>
 
-    <!-- 💬 Messages -->
-    <div class="admin-icon dropdown">
-      <i class="fa-regular fa-envelope"></i>
-
-      <div class="dropdown-menu">
-        <h4>Messages</h4>
-        <a href="messages.php">View all messages</a>
-      </div>
-    </div>
-
     <!-- 👤 PROFILE -->
     <div class="admin-profile dropdown">
       <i class="fa-regular fa-circle-user"></i>
