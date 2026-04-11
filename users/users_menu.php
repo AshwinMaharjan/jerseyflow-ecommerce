@@ -54,21 +54,15 @@ function isOpen(array $pages, string $current): string {
 
     <div class="sidebar-divider"></div>
 
-    <!-- ── 2. Products Management ────────────────────────────────────────── -->
-    <div class="sidebar-item<?= isOpen(['products', 'add_product', 'product_categories', 'product_attributes'], $current_page) ?>">
-      <button class="sidebar-link<?= isActive('products', $current_page) ?>"
-              onclick="toggleMenu(this)">
-        <span class="sidebar-link-icon"><i class="fa-solid fa-box-open"></i></span>
+
+      <!-- ── 3. Orders Management ──────────────────────────────────────────── -->
+<div class="sidebar-item">
+<button class="sidebar-link" onclick="window.location.href='/jerseyflow-ecommerce/users/users_orders.php'">
+          <span class="sidebar-link-icon"><i class="fa-solid fa-users"></i></span>
         <span class="sidebar-link-label">My Orders</span>
-        <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
-      <div class="sidebar-dropdown">
-<a href="/jerseyflow-ecommerce/users/orders/all_orders.php" class="sidebar-dropdown-link"> All Orders</a>
-<a href="/jerseyflow-ecommerce/users/orders/pending_orders.php" class="sidebar-dropdown-link"> Pending</a>
-<a href="/jerseyflow-ecommerce/users/orders/delivered_orders.php" class="sidebar-dropdown-link"> Delivered</a>      </div>
     </div>
 
-    <!-- ── 3. Orders Management ──────────────────────────────────────────── -->
     <div class="sidebar-item<?= isOpen(['orders', 'order_detail', 'shipments', 'returns'], $current_page) ?>">
       <button class="sidebar-link<?= isActive('orders', $current_page) ?>"
               onclick="toggleMenu(this)">

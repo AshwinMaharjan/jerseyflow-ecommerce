@@ -128,8 +128,8 @@ $stmt->close();
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function payment_label(int $method_id): string {
     return match ($method_id) {
-        1       => 'COD',
-        2       => 'eSewa',
+        2       => 'COD',
+        1       => 'eSewa',
         default => 'Other',
     };
 }
