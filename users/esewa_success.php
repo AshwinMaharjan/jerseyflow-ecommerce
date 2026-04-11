@@ -592,7 +592,7 @@ if (empty($error_message) && $order_id) {
             transaction details and we will resolve it promptly.
         </p>
         <div class="actions">
-            <a href="orders.php" class="btn-primary">
+            <a href="/jerseyflow-ecommerce/users/users_orders.php" class="btn-primary">
                 <i class="fa-solid fa-box"></i>
                 My Orders
             </a>
@@ -711,7 +711,7 @@ if (empty($error_message) && $order_id) {
     <!-- Actions -->
     <div class="card" style="background:transparent;box-shadow:none;padding:0;">
         <div class="actions">
-            <a href="orders.php" class="btn-primary">
+            <a href="/jerseyflow-ecommerce/users/users_orders.php" class="btn-primary">
                 <i class="fa-solid fa-box"></i>
                 View My Orders
             </a>
