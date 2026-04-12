@@ -108,13 +108,12 @@ function isOpen(array $pages, string $current): string {
         <span class="sidebar-chevron"><i class="fa-solid fa-chevron-down"></i></span>
       </button>
       <div class="sidebar-dropdown">
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_dashboard.php" class="sidebar-dropdown-link">Dashboard</a>
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_stock_levels.php" class="sidebar-dropdown-link">Stock Levels</a>
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_movements.php" class="sidebar-dropdown-link">Stock Movement</a>
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_adjust.php" class="sidebar-dropdown-link">Adjust Stock </a>
+        <!-- <a href="/jerseyflow-ecommerce/admin/ims/ims_dashboard.php" class="sidebar-dropdown-link">Dashboard</a>
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_stock_levels.php" class="sidebar-dropdown-link">Stock Levels</a> -->
+        <!-- <a href="/jerseyflow-ecommerce/admin/ims/ims_movements.php" class="sidebar-dropdown-link">Stock Movement</a> -->
+        <a href="/jerseyflow-ecommerce/admin/ims/ims_adjust_stock_movements.php" class="sidebar-dropdown-link">Adjust Stock </a>
         <a href="/jerseyflow-ecommerce/admin/ims/ims_low_stock.php" class="sidebar-dropdown-link">Low Stock Alerts</a>
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_reorder.php" class="sidebar-dropdown-link">Reorder Management</a>
-        <a href="/jerseyflow-ecommerce/admin/ims/ims_reports.php" class="sidebar-dropdown-link">Inventory Reports</a>
+        <!-- <a href="/jerseyflow-ecommerce/admin/ims/ims_reports.php" class="sidebar-dropdown-link">Inventory Reports</a> -->
 
       </div>
     </div>
