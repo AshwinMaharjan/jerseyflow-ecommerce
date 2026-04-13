@@ -25,7 +25,7 @@ $reason = $_GET['reason'] ?? '';
 </head>
 <body>
 
-<?php include("navbar.php"); ?>
+<?php include("homepage/navbar.php"); ?>
 
 <!-- SUCCESS POPUP -->
 <div id="loginSuccessBox">

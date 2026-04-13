@@ -1,0 +1,468 @@
+:root {
+    --bg:        #121212;
+    --panel:     #1A1A1A;
+    --panel2:    #202020;
+    --text:      #EEE5D8;
+    --muted:     rgba(238,229,216,.6);
+    --border:    rgba(255,255,255,.08);
+    --red:       #681010;
+    --red-hover: #7d1414;
+    --red-soft:  rgba(104,16,16,.2);
+    --green:     #166534;
+    --hover:     rgba(255,255,255,.06);
+    --shadow:    0 4px 18px rgba(0,0,0,.4);
+    --nav-h:     64px;
+    --radius:    8px;
+}
+
+/* ============================================================
+   contact.css — JerseyFlow Contact Page
+   ============================================================ */
+
+/* ---------- Reset / Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: #141414;
+    color:       var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height:  100vh;
+}
+
+/* ---------- Page Wrapper ---------- */
+.contact-page {
+    padding-top: calc(var(--nav-h) + 60px);
+    padding-bottom: 80px;
+    min-height: 100vh;
+}
+
+/* ---------- Page Header ---------- */
+.contact-header {
+    text-align: center;
+    margin-bottom: 56px;
+    padding: 0 20px;
+}
+
+.contact-header .section-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid var(--red-soft);
+    background: var(--red-soft);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+}
+
+.contact-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(38px, 6vw, 68px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    line-height: 1;
+    color: var(--text);
+}
+
+.contact-header h1 span {
+    color: var(--red);
+}
+
+.contact-header p {
+    margin-top: 16px;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.65;
+}
+
+/* ---------- Two-Column Layout ---------- */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.45fr;
+    gap: 32px;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+@media (max-width: 768px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Info Panel ---------- */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: background .2s, border-color .2s;
+}
+
+.info-card:hover {
+    background: var(--panel2);
+    border-color: rgba(255,255,255,.14);
+}
+
+.info-card .icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius);
+    background: var(--red-soft);
+    border: 1px solid rgba(104,16,16,.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--red);
+    font-size: 18px;
+}
+
+.info-card .icon-wrap svg {
+    width: 20px;
+    height: 20px;
+    stroke: #c0392b;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.info-card .info-text h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+}
+
+.info-card .info-text p,
+.info-card .info-text a {
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.55;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.info-card .info-text a:hover {
+    color: #c0392b;
+}
+
+/* Hours card */
+.hours-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.hours-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: var(--text);
+    gap: 20px;
+}
+
+.hours-list li span:first-child {
+    color: var(--muted);
+}
+
+/* Social row */
+.social-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius);
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-decoration: none;
+    transition: background .2s, border-color .2s, color .2s;
+}
+
+.social-btn:hover {
+    background: var(--red-soft);
+    border-color: rgba(104,16,16,.4);
+    color: #c0392b;
+}
+
+.social-btn svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+}
+
+/* ---------- Contact Form ---------- */
+.contact-form-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
+}
+
+@media (max-width: 500px) {
+    .contact-form-wrap { padding: 24px 18px; }
+}
+
+.contact-form-wrap h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text);
+    margin-bottom: 26px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(238,229,216,.25);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: rgba(104,16,16,.55);
+    background: #1e1e1e;
+    box-shadow: 0 0 0 3px var(--red-soft);
+}
+
+.form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: var(--panel2);
+    color: var(--text);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.55;
+}
+
+/* Checkbox */
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.form-check input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    margin-top: 2px;
+    position: relative;
+    transition: background .2s, border-color .2s;
+}
+
+.form-check input[type="checkbox"]:checked {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.form-check input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 6px; height: 10px;
+    border: 2px solid #fff;
+    border-top: none; border-left: none;
+    transform: rotate(42deg);
+}
+
+.form-check label {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.form-check label a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Submit Button */
+.btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    padding: 13px 24px;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 18px rgba(104,16,16,.3);
+}
+
+.btn-submit:hover {
+    background: var(--red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(104,16,16,.45);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit svg {
+    width: 17px;
+    height: 17px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Divider ---------- */
+.form-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 22px 0;
+}
+
+/* ---------- FAQ strip (optional) ---------- */
+.faq-strip {
+    max-width: 1060px;
+    margin: 52px auto 0;
+    padding: 0 24px;
+}
+
+.faq-strip h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text);
+    margin-bottom: 18px;
+}
+
+.faq-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 640px) {
+    .faq-list { grid-template-columns: 1fr; }
+}
+
+.faq-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.faq-item h4 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 7px;
+}
+
+.faq-item p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+}

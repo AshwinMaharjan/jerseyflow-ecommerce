@@ -16,7 +16,7 @@ session_start();
 </head>
 <body>
 
-    <?php include 'navbar.php'; ?>
+    <?php include 'homepage/navbar.php'; ?>
 
     <main>
 
