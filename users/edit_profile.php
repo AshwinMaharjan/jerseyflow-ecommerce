@@ -146,7 +146,6 @@ $profileImage = !empty($user['profile_image']) ? $user['profile_image'] : null;
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edit Profile — <?= e($user['full_name']) ?></title>
   <link rel="icon" href="../images/logo_icon.ico" type="image/x-icon">
-
   <link rel="stylesheet" href="../style/navbar.css" />
   <link rel="stylesheet" href="../style/footer.css" />
   <link rel="stylesheet" href="../style/edit_profile.css" />

@@ -1,0 +1,369 @@
+/* ── users_homepage.css ─────────────────────────────────────────── */
+
+:root {
+    --bg:        #121212;
+    --panel:     #1A1A1A;
+    --panel2:    #202020;
+    --text:      #EEE5D8;
+    --muted:     rgba(238,229,216,.6);
+    --border:    rgba(255,255,255,.08);
+    --red:       #681010;
+    --red-hover: #7d1414;
+    --red-soft:  rgba(104,16,16,.2);
+    --green:     #166534;
+    --hover:     rgba(255,255,255,.06);
+    --shadow:    0 4px 18px rgba(0,0,0,.4);
+    --nav-h:     64px;
+    --radius:    8px;
+
+    /* Extended palette for dashboard accents */
+    --accent-blue:   #1d4ed8;
+    --accent-amber:  #b45309;
+    --accent-green:  #166534;
+    --accent-red:    #681010;
+
+    --blue-soft:     rgba(29,78,216,.18);
+    --amber-soft:    rgba(180,83,9,.18);
+    --green-soft:    rgba(22,101,52,.18);
+
+    --chart-grid:    rgba(255,255,255,.05);
+}
+
+body{
+    background-color: #141414;
+}
+
+/* ── Root container ─────────────────────────────────────────────── */
+.dashboard-root {
+    padding: 24px 28px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Welcome bar ─────────────────────────────────────────────────── */
+.welcome-bar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.welcome-text {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.welcome-label {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.welcome-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -.3px;
+}
+
+.welcome-date {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ── KPI Grid ────────────────────────────────────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+.kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow);
+    transition: background .2s, transform .2s;
+}
+
+.kpi-card:hover {
+    background: var(--panel2);
+    transform: translateY(-2px);
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.kpi-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.kpi-icon--blue  { background: var(--blue-soft);  color: #60a5fa; }
+.kpi-icon--amber { background: var(--amber-soft); color: #fbbf24; }
+.kpi-icon--green { background: var(--green-soft); color: #4ade80; }
+.kpi-icon--red   { background: var(--red-soft);   color: #f87171; }
+
+.kpi-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+/* ── Chart rows ──────────────────────────────────────────────────── */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.charts-row--sm .chart-card {
+    /* slightly shorter */
+}
+
+@media (max-width: 900px) {
+    .charts-row { grid-template-columns: 1fr; }
+}
+
+/* ── Chart card ──────────────────────────────────────────────────── */
+.chart-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.chart-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: .1px;
+}
+
+.chart-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.chart-body {
+    position: relative;
+    height: 220px;
+}
+
+.chart-body--sm {
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-body canvas {
+    width: 100% !important;
+}
+
+.chart-body--sm canvas {
+    max-height: 220px;
+}
+
+/* ── Recent orders table ─────────────────────────────────────────── */
+.table-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.table-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.orders-table thead tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.orders-table th {
+    text-align: left;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.orders-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+}
+
+.orders-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.orders-table tbody tr:hover {
+    background: var(--hover);
+}
+
+.orders-table td {
+    padding: 11px 14px;
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.order-id {
+    font-weight: 600;
+    color: #60a5fa;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.order-amount {
+    font-weight: 600;
+}
+
+/* ── Status badges ───────────────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: .3px;
+    border: 1px solid transparent;
+}
+
+/* order_status: pending | processing | shipped | delivered */
+/* payment_status: unpaid | paid | failed | refunded       */
+
+.badge-delivered {
+    background: rgba(22,101,52,.25);
+    color: #4ade80;
+    border-color: rgba(74,222,128,.2);
+}
+
+.badge-pending {
+    background: rgba(180,83,9,.25);
+    color: #fbbf24;
+    border-color: rgba(251,191,36,.2);
+}
+
+.badge-processing {
+    background: rgba(29,78,216,.22);
+    color: #93c5fd;
+    border-color: rgba(147,197,253,.2);
+}
+
+.badge-shipped {
+    background: rgba(109,40,217,.22);
+    color: #c4b5fd;
+    border-color: rgba(196,181,253,.2);
+}
+
+.badge-failed {
+    background: rgba(127,29,29,.3);
+    color: #fca5a5;
+    border-color: rgba(252,165,165,.2);
+}
+
+.badge-refunded {
+    background: rgba(15,118,110,.22);
+    color: #5eead4;
+    border-color: rgba(94,234,212,.2);
+}
+
+.badge-muted {
+    background: rgba(255,255,255,.07);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────── */
+.table-wrap::-webkit-scrollbar { height: 4px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.12);
+    border-radius: 4px;
+}
