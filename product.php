@@ -106,6 +106,7 @@ $page_title     = htmlspecialchars($product['product_name']);
     <link rel="stylesheet" href="assets/fonts/barlow-condensed/barlow-condensed.css">
     <link rel="stylesheet" href="style/footer.css">
     <link rel="stylesheet" href="style/product.css">
+    <link rel="stylesheet" href="style/navbar.css">
 </head>
 <body>
 <?php include("homepage/navbar.php"); ?>
@@ -268,7 +269,7 @@ $page_title     = htmlspecialchars($product['product_name']);
 
     <?php if (!empty($related)): ?>
         <section class="related-section">
-            <h2 class="related-title">Related Products</h2>
+            <h2 class="related-title">Related Jerseys</h2>
             <div class="related-grid">
                 <?php foreach ($related as $r): ?>
                     <?php
