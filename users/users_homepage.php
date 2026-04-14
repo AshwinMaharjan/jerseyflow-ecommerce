@@ -96,9 +96,8 @@ $status_rows = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $status_rows[$row['order_status']] = (int) $row['cnt'];
 }
-$status_labels = ['pending', 'processing', 'shipped', 'delivered'];
+$status_labels = ['pending', 'cancelled', 'shipped', 'delivered']; // ← swap processing → cancelled
 $status_data   = array_map(fn($s) => $status_rows[$s] ?? 0, $status_labels);
-
 // ── Chart: Payment Method Usage ──────────────────────────────────
 $stmt = mysqli_prepare($conn, "
     SELECT pm.method_name, COUNT(o.order_id) AS cnt
@@ -148,7 +147,7 @@ function statusClass(string $status): string {
         'paid'       => 'badge-delivered',
         'pending'    => 'badge-pending',
         'unpaid'     => 'badge-pending',
-        'processing' => 'badge-processing',
+        'cancelled'  => 'badge-failed',      // ← add this
         'shipped'    => 'badge-shipped',
         'failed'     => 'badge-failed',
         'refunded'   => 'badge-refunded',
@@ -162,16 +161,17 @@ function statusClass(string $status): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users Homepage | Dashboard</title>
+    <link rel="icon" href="../images/logo_icon.ico" type="image/x-icon">
+<link rel="stylesheet" href="../style/users_navbar.css" />
+  <link rel="stylesheet" href="../style/footer.css" />
+  <link rel="stylesheet" href="../style/users_homepage.css" />
+
 </head>
 <body>
     <?php include 'users_navbar.php'; ?>
     <div class="page-wrapper">
 <?php include 'users_menu.php'; ?>
 
-<link rel="icon" href="../images/logo_icon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="../style/users_navbar.css" />
-  <link rel="stylesheet" href="../style/footer.css" />
-  <link rel="stylesheet" href="../style/users_homepage.css" />
 <div class="dashboard-root">
 
     <!-- ── Welcome Bar ──────────────────────────────────── -->

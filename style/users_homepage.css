@@ -367,3 +367,18 @@ body{
     background: rgba(255,255,255,.12);
     border-radius: 4px;
 }
+
+/* Ensure badges stay inline inside their table cell */
+tbody td {
+    position: static;
+}
+
+.badge {
+    position: static !important;
+    display: inline-flex;
+}
+
+tbody tr.order-row {
+    position: static; /* override any inherited position:relative */
+}
+

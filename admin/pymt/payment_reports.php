@@ -46,7 +46,7 @@ foreach ($status_rows as $r) {
 $gw_rows = $conn->query("
     SELECT gateway, COUNT(*) AS cnt, SUM(amount) AS total
     FROM payments
-    WHERE payment_status = 'paid'
+    WHERE payment_status IN ('paid', 'unpaid', 'pending')
     GROUP BY gateway
 ")->fetch_all(MYSQLI_ASSOC);
 $gw_labels = $gw_counts = $gw_totals = [];

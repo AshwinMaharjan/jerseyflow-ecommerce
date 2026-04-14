@@ -216,9 +216,9 @@ td {
 }
 .status-paid     { background: rgba(22,101,52,.25);   color: #4ade80; }
 .status-unpaid   { background: rgba(255,255,255,.07); color: var(--muted); }
+.status-pending  { background: rgba(180,83,9,.25);    color: #fbbf24; }   /* ← add this */
 .status-failed   { background: rgba(104,16,16,.25);   color: #f87171; }
 .status-refunded { background: rgba(146,64,14,.25);   color: #fbbf24; }
-
 /* ── Empty state ───────────────────────────────────────────────────────────── */
 .empty-state {
     display: flex;

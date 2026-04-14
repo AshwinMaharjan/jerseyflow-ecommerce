@@ -1,31 +1,309 @@
-*, *::before, *::after {
-    box-sizing: border-box;
+/* admin_homepage.css — JerseyFlow Admin Dashboard */
+
+:root {
+    --bg:        #121212;
+    --panel:     #1A1A1A;
+    --panel2:    #202020;
+    --text:      #EEE5D8;
+    --muted:     rgba(238,229,216,.6);
+    --border:    rgba(255,255,255,.08);
+    --red:       #681010;
+    --red-hover: #7d1414;
+    --red-soft:  rgba(104,16,16,.2);
+    --green:     #166534;
+    --hover:     rgba(255,255,255,.06);
+    --shadow:    0 4px 18px rgba(0,0,0,.4);
+    --nav-h:     64px;
+    --radius:    8px;
+
+    /* Accent soft fills */
+    --blue-soft:   rgba(29,78,216,.18);
+    --green-soft:  rgba(22,101,52,.18);
+    --amber-soft:  rgba(180,83,9,.18);
+    --red-soft2:   rgba(104,16,16,.22);
+    --purple-soft: rgba(109,40,217,.18);
+    --teal-soft:   rgba(15,118,110,.18);
 }
 
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+body {
+    background: #141414;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Sits below the fixed navbar */
-.page-wrapper {
-    display: flex;
-    margin-top: 60px;           /* must match your navbar height exactly */
-    min-height: calc(100vh - 60px);
-    align-items: stretch;
-}
+/* ── Layout ──────────────────────────────────────────────────────────────── */
 
-/* Right side: content + footer stacked vertically */
-.page-right {
+.admin-content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - 60px);
+    padding: 24px 28px 56px;
+    max-width: 1440px;
+    width: 100%;
     overflow-x: hidden;
 }
 
-.content-wrapper {
-    flex: 1;                    /* grows to fill space, pushes footer down */
-    padding: 30px;
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
 }
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px;
+    letter-spacing: -.3px;
+}
+
+.subtitle {
+    font-size: .83rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+.page-date {
+    font-size: .8rem;
+    color: var(--muted);
+    padding-top: 4px;
+}
+
+/* ── KPI Grid ────────────────────────────────────────────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1300px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 860px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+.kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+    transition: background .18s, transform .18s;
+}
+
+.kpi-card:hover {
+    background: var(--panel2);
+    transform: translateY(-2px);
+}
+
+.kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.kpi-green  { background: var(--green-soft);  color: #4ade80; }
+.kpi-blue   { background: var(--blue-soft);   color: #60a5fa; }
+.kpi-amber  { background: var(--amber-soft);  color: #fbbf24; }
+.kpi-purple { background: var(--purple-soft); color: #c4b5fd; }
+.kpi-teal   { background: var(--teal-soft);   color: #5eead4; }
+.kpi-red    { background: var(--red-soft2);   color: #f87171; }
+
+.kpi-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.kpi-label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.kpi-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.kpi-sub {
+    font-size: .7rem;
+    color: var(--muted);
+}
+
+/* ── Chart card shared ───────────────────────────────────────────────────── */
+.chart-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chart-header h2 {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 2px;
+}
+
+.chart-sub {
+    font-size: .75rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+.chart-badge {
+    font-size: .68rem;
+    font-weight: 500;
+    background: var(--hover);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 9px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.chart-wrap {
+    position: relative;
+    height: 230px;
+}
+
+.chart-wrap-tall {
+    height: 260px;
+}
+
+.chart-wrap-circle {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-wrap canvas { width: 100% !important; }
+.chart-wrap-circle canvas { max-height: 210px; }
+
+/* ── Row 2: Full-width Revenue ───────────────────────────────────────────── */
+.chart-row-full {
+    margin-bottom: 20px;
+}
+
+/* ── Row 3: Split (Orders + Top Products) ────────────────────────────────── */
+.chart-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) { .chart-row-split { grid-template-columns: 1fr; } }
+
+/* ── Row 4: Quad charts ──────────────────────────────────────────────────── */
+.chart-row-quad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) { .chart-row-quad { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .chart-row-quad { grid-template-columns: 1fr; } }
+
+/* ── Insights Row ────────────────────────────────────────────────────────── */
+.insights-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 860px) { .insights-row { grid-template-columns: 1fr; } }
+
+.insight-block {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+}
+
+.insight-title {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insight-title i {
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.insight-kpi-row {
+    display: flex;
+    gap: 0;
+}
+
+.insight-kpi {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 16px;
+    border-right: 1px solid var(--border);
+}
+
+.insight-kpi:first-child { padding-left: 0; }
+.insight-kpi:last-child  { border-right: none; }
+
+.insight-kpi-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.insight-kpi-label {
+    font-size: .72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.insight-red   { color: #f87171; }
+.insight-green { color: #4ade80; }
+.insight-blue  { color: #60a5fa; }

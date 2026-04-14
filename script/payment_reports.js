@@ -8,8 +8,9 @@
     // ── Shared palette ────────────────────────────────────────────────────────
     const COLORS = {
         paid:     '#4ade80',
+        pending:  '#fbbf24',   // ← change to amber
         failed:   '#f87171',
-        refunded: '#fbbf24',
+        refunded: '#5eead4',   // teal
         unpaid:   'rgba(238,229,216,.35)',
         esewa:    '#5B21B6',
         cod:      '#0ea5e9',
@@ -19,6 +20,7 @@
 
     const STATUS_COLORS = {
         Paid:     COLORS.paid,
+        Pending:  COLORS.pending,
         Failed:   COLORS.failed,
         Refunded: COLORS.refunded,
         Unpaid:   COLORS.unpaid,

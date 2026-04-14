@@ -205,7 +205,7 @@ if (empty($error_message)) {
                 (?, ?, ?,
                  ?, 'paid',
                  ?, ?,
-                 'processing', NOW())
+                 'pending', NOW())
         ");
 
         $order_stmt->bind_param(

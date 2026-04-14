@@ -140,7 +140,7 @@
                     data:            dashData.statusDist.data,
                     backgroundColor: [
                         'rgba(251,191,36,0.85)',   // pending    - amber
-                        'rgba(96,165,250,0.85)',   // processing - blue
+                        'rgba(252,165,165,0.85)',  // cancelled - red   ← was processing blue
                         'rgba(196,181,253,0.85)',  // shipped    - purple
                         'rgba(74,222,128,0.85)',   // delivered  - green
                     ],
