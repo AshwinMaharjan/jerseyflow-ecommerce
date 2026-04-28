@@ -150,7 +150,7 @@ while ($r = $result->fetch_assoc()) {
     <link rel="stylesheet" href="/jerseyflow-ecommerce/style/footer.css">
     <link rel="stylesheet" href="/jerseyflow-ecommerce/style/admin_homepage.css">
     <link rel="stylesheet" href="../../assets/fontawesome/css/all.min.css">
-    <link rel="icon" href="../images/logo_icon.ico" type="image/x-icon">
+    <link rel="icon" href="../images/logo_icon.ico" type="image/x-icon"> 
 </head>
 <body>
 
