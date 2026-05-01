@@ -2,6 +2,10 @@
 
 A web-based e-commerce application for browsing and purchasing football jerseys online, built with PHP and MySQL.
 
+## 🌐 Live Demo
+
+https://jersey-flow.free.nf/?i=1
+
 ## Features
 
 - **User Authentication**: Register, login and manage user profiles
