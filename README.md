@@ -2,7 +2,7 @@
 
 A web-based e-commerce application for browsing and purchasing football jerseys online, built with PHP and MySQL.
 
-## 🌐 Live Demo
+## Live Demo
 
 https://jersey-flow.free.nf/?i=1
 
@@ -119,7 +119,7 @@ jerseyflow-ecommerce/
 - Users Management: <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/b744210c-0408-47d0-b3c5-358a8a583126" />
 - Adjust Stock Page: <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1239607d-7aab-48e7-8abd-79c75bdfaff0" />
 - Low Stock Alerts Page:  <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/877524a8-aec1-42df-9d16-91839a9a42c7" />
-- Payement Transaction Page:  <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/2a48c327-09d3-4e47-9cc3-edbe0a148806" />
+- Payment Transaction Page:  <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/2a48c327-09d3-4e47-9cc3-edbe0a148806" />
 - Payment Reports Page: <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/98ffb4ca-e4b3-4186-bd56-8638eb4a8f05" />  <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0a05f711-8739-40e0-91f8-54419c760cff" />
 - Profile Page: <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/81f88f00-2cca-4e5b-b703-b414e2886944" />
 - Change Password Page: <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/bc29cfba-bd37-4c1f-9037-7b76e0eecca0" /> 
@@ -135,9 +135,9 @@ jerseyflow-ecommerce/
 
 ## Roadmap
 
-- [ ] Real payment gateway integration (e.g., Stripe, eSewa, PayPal)
+- [ ] Real payment gateway integration (like eSewa, Khalti, Stripe)
 - [ ] Email notifications for order confirmation
-- [ ] Wishlist / saved items feature
+- [ ] Wishlist / Saved items feature
 - [ ] Product reviews and ratings
 - [ ] Discount codes and promotions
 
