@@ -1,0 +1,11 @@
+/uploads/
+/node_modules/
+/vendor/
+/cache/
+/logs/
+*.log
+*.zip
+*.rar
+.env
+.DS_Store
+Thumbs.db
